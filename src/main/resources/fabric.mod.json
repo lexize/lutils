@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "lutils",
+  "version": "${version}",
+  "name": "Lutils",
+  "description": "Figura utils addon",
+  "authors": [
+    "Lexize"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "figura_api": [
+      "org.lexize.lutils.LUtils"
+    ]
+  },
+  "depends": {
+    "fabric": "*",
+    "figura": ">=0.1.0-rc.7"
+  }
+}
