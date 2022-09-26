@@ -9,8 +9,6 @@ import org.moon.figura.lua.LuaWhitelist;
 
 import java.io.*;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -31,11 +29,11 @@ public class LUtilsFile {
     private String _folderPathString;
     private Path _folderPath;
 
-    private boolean _inited = false;
+    private boolean _initialized = false;
 
     @LuaWhitelist
     public void init(@LuaNotNil String path) {
-        if (_inited) throw new LuaError("You can't reinitialize file submodule.");
+        if (_initialized) throw new LuaError("You can't reinitialize file submodule.");
         if (FORBIDDEN_FOLDER_SYMBOLS_PATTERN.matcher(path).find()) {
             System.out.println("aboba");
             throw new LuaError(String.format("Data folder name cant contain any of the following symbols:\n    %s",
@@ -44,7 +42,7 @@ public class LUtilsFile {
         _folderPathString = "data/%s".formatted(path);
         _folderPath = FiguraMod.getFiguraDirectory().resolve(_folderPathString).toAbsolutePath().normalize();
         _folderPath.toFile().mkdirs();
-        _inited = true;
+        _initialized = true;
     }
 
     private LuaError BuildOutOfDataFolderError(Path path) {
@@ -56,7 +54,7 @@ public class LUtilsFile {
     }
 
     private void checkIsInitialized() {
-        if (!_inited) throw NOT_INITIALIZED_ERROR;
+        if (!_initialized) throw NOT_INITIALIZED_ERROR;
     }
 
 

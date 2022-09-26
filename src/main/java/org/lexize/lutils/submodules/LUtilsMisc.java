@@ -1,5 +1,6 @@
 package org.lexize.lutils.submodules;
 
+import org.lexize.lutils.LUtils;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaInteger;
 import org.luaj.vm2.LuaTable;
@@ -10,6 +11,8 @@ import org.moon.figura.lua.ReadOnlyLuaTable;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.regex.Pattern;
 
 @LuaWhitelist
 public class LUtilsMisc {
@@ -38,20 +41,35 @@ public class LUtilsMisc {
     }
 
     public static final ReadOnlyLuaTable charsets;
+    public static final ReadOnlyLuaTable regex_flags;
 
     static {
-        LuaTable table = new LuaTable();
+        LuaTable _chTable = new LuaTable();
         for (LUtilsCharset ch:
                 LUtilsCharset.values()) {
-            table.set(ch.name(), ch.name());
+            _chTable.set(ch.name(), ch.name());
         }
-        charsets = new ReadOnlyLuaTable(table);
+        charsets = new ReadOnlyLuaTable(_chTable);
+
+        LuaTable _rfTable = new LuaTable();
+        _rfTable.set("UNIX_LINES",                 Pattern.UNIX_LINES);
+        _rfTable.set("CASE_INSENSITIVE",           Pattern.CASE_INSENSITIVE);
+        _rfTable.set("COMMENTS",                   Pattern.COMMENTS);
+        _rfTable.set("MULTILINE",                  Pattern.MULTILINE);
+        _rfTable.set("LITERAL",                    Pattern.LITERAL);
+        _rfTable.set("DOTALL",                     Pattern.DOTALL);
+        _rfTable.set("UNICODE_CASE",               Pattern.UNICODE_CASE);
+        _rfTable.set("CANON_EQ",                   Pattern.CANON_EQ);
+        _rfTable.set("UNICODE_CHARACTER_CLASS",    Pattern.UNICODE_CHARACTER_CLASS);
+        regex_flags = new ReadOnlyLuaTable(_rfTable);
+
     }
 
     @LuaWhitelist
     public Object __index(String args) {
         return switch (args) {
             case ("charsets") -> charsets;
+            case ("regex_flags") -> regex_flags;
             default -> null;
         };
     }
@@ -60,39 +78,30 @@ public class LUtilsMisc {
     public LuaTable stringToBytes(@LuaNotNil String str, String charsetId) {
         Charset chst = StandardCharsets.UTF_8;
         if (charsetId != null) chst = LUtilsCharset.valueOf(charsetId).getCharset();
-        LuaTable tbl = new LuaTable();
         byte[] bytes = str.getBytes(chst);
 
-        for (int i = 0; i < bytes.length; i++) {
-            tbl.set(i+1, LuaValue.valueOf(bytes[i]));
-        }
-
-        return tbl;
+        return LUtils.Utils.byteArrayToTable(bytes);
     }
 
     @LuaWhitelist
     public String bytesToString(@LuaNotNil LuaTable bytesTable, String charsetId) {
         Charset chst = StandardCharsets.UTF_8;
         if (charsetId != null) chst = LUtilsCharset.valueOf(charsetId).getCharset();
-        byte[] bytes = new byte[bytesTable.length()];
-        for (LuaValue k:
-             bytesTable.keys()) {
-            int i;
-            try {
-                i = k.checkint();
-            } catch (LuaError e) {
-                throw new LuaError("Indexes in array should be only integer's.");
-            }
-            int v;
-            try {
-                v = bytesTable.get(i).checkint();
-            }
-            catch (LuaError e) {
-                throw new LuaError("Values in array should be integer's.");
-            }
-            bytes[i-1] = (byte)(v % 256);
-        }
+        byte[] bytes = LUtils.Utils.tableToByteArray(bytesTable);
         return new String(bytes, chst);
+    }
+
+    @LuaWhitelist
+    public String bytesToBase64(@LuaNotNil LuaTable bytesTable) {
+        byte[] bytes = LUtils.Utils.tableToByteArray(bytesTable);
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    @LuaWhitelist
+    public LuaTable base64ToBytes(@LuaNotNil String base64) {
+        return LUtils.Utils.byteArrayToTable(
+                Base64.getDecoder().decode(base64)
+        );
     }
 
 }

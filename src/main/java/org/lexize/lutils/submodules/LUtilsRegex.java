@@ -12,21 +12,6 @@ import java.util.regex.Pattern;
 
 @LuaWhitelist
 public class LUtilsRegex {
-    @LuaWhitelist
-    public static final Map<String, Integer> flags;
-
-    static  {
-        flags = new HashMap<>();
-        flags.put("UNIX_LINES",                 Pattern.UNIX_LINES);
-        flags.put("CASE_INSENSITIVE",           Pattern.CASE_INSENSITIVE);
-        flags.put("COMMENTS",                   Pattern.COMMENTS);
-        flags.put("MULTILINE",                  Pattern.MULTILINE);
-        flags.put("LITERAL",                    Pattern.LITERAL);
-        flags.put("DOTALL",                     Pattern.DOTALL);
-        flags.put("UNICODE_CASE",               Pattern.UNICODE_CASE);
-        flags.put("CANON_EQ",                   Pattern.CANON_EQ);
-        flags.put("UNICODE_CHARACTER_CLASS",    Pattern.UNICODE_CHARACTER_CLASS);
-    }
 
     private Avatar _avatar;
 
