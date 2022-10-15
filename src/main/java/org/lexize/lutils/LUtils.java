@@ -10,7 +10,7 @@ import org.lexize.lutils.submodules.*;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.moon.figura.avatars.Avatar;
+import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.FiguraAPI;
 import org.moon.figura.lua.LuaWhitelist;
 
@@ -30,12 +30,8 @@ public class LUtils implements FiguraAPI {
     public LUtilsRegex regex;
     @LuaWhitelist
     public LUtilsMisc misc = new LUtilsMisc();
-
     @LuaWhitelist
-    public LUtilsHttp http = new LUtilsHttp();
-
-    public LUtilsNbt nbt;
-
+    public LUtilsHttp http;
     public LUtils() {
 
     }
@@ -45,8 +41,8 @@ public class LUtils implements FiguraAPI {
         if(_avatar.isHost) {
             file = new LUtilsFile();
         }
-        nbt = new LUtilsNbt(avatar);
         regex = new LUtilsRegex(_avatar);
+        http  = new LUtilsHttp(_avatar);
     }
 
     @LuaWhitelist
@@ -57,7 +53,6 @@ public class LUtils implements FiguraAPI {
           case "regex" -> regex;
           case "misc" -> misc;
           case "http" -> http;
-          case "nbt" -> nbt;
           default -> null;
         };
     }
@@ -67,6 +62,7 @@ public class LUtils implements FiguraAPI {
     public FiguraAPI build(Avatar avatar) {
         return new LUtils(avatar);
     }
+
 
     @Override
     public String getName() {

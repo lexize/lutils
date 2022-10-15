@@ -98,5 +98,5 @@ public class LUtilsNbt {
         LUtilsNbtValue.NbtReturnValue val = LUtilsNbtValue.NbtType.Compound.typeGetFunction.apply(bytes, 0);
         return new LVarargs(LuaValue.valueOf(val.name()), _ltm.javaToLua(val.value()));
     }
-    
+
 }

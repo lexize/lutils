@@ -6,6 +6,7 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
+import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.LuaNotNil;
 import org.moon.figura.lua.LuaWhitelist;
 
@@ -20,8 +21,12 @@ import java.util.Map;
 
 @LuaWhitelist
 public class LUtilsHttp {
-
+    private final Avatar _parentAvatar;
     private HttpClient _client = HttpClient.newBuilder().build();
+
+    public LUtilsHttp(Avatar avatar) {
+        _parentAvatar = avatar;
+    }
 
     @LuaWhitelist
     public LVarargs get(@LuaNotNil String uri, LuaTable headers) throws IOException, InterruptedException {
