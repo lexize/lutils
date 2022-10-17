@@ -1,15 +1,13 @@
-package org.lexize.lutils.nbt;
+package org.lexize.lutils.submodules.nbt;
 
 import org.lexize.lutils.LUtils;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @LuaWhitelist
 public class LUtilsNbtCompound extends LUtilsNbtValue<Map<String, LUtilsNbtValue>>{

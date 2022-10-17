@@ -1,7 +1,7 @@
 package org.lexize.lutils.submodules;
 
-import org.lexize.lutils.streams.LUtilsInputStream;
-import org.lexize.lutils.streams.LUtilsOutputStream;
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.luaj.vm2.LuaError;
 import org.moon.figura.FiguraMod;
 import org.moon.figura.lua.LuaNotNil;

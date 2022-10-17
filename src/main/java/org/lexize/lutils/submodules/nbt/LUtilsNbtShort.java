@@ -1,4 +1,4 @@
-package org.lexize.lutils.nbt;
+package org.lexize.lutils.submodules.nbt;
 
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;

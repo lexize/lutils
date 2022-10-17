@@ -1,4 +1,4 @@
-package org.lexize.lutils.nbt;
+package org.lexize.lutils.submodules.nbt;
 
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
@@ -6,16 +6,16 @@ import org.moon.figura.lua.LuaWhitelist;
 import java.util.Arrays;
 
 @LuaWhitelist
-public class LUtilsNbtLong extends LUtilsNbtValue<Long>  implements LUtilsNbtValue.NbtGettable<Long>, LUtilsNbtValue.NbtSettable<Long> {
+public class LUtilsNbtDouble extends LUtilsNbtValue<Double> implements LUtilsNbtValue.NbtGettable<Double>, LUtilsNbtValue.NbtSettable<Double> {
+    public LUtilsNbtDouble() {}
 
-    public LUtilsNbtLong() {};
-    public LUtilsNbtLong(Long value) {
+    public LUtilsNbtDouble(Double value) {
         super(value);
     }
 
-
     @Override
     public byte[] getPureData() {
+        long value = Double.doubleToLongBits(this.value);
         byte[] valueBytes = new byte[8];
         valueBytes[7] = (byte) (value & 0xff);
         valueBytes[6] = (byte) ((value >> 8 ) & 0xff);
@@ -31,12 +31,12 @@ public class LUtilsNbtLong extends LUtilsNbtValue<Long>  implements LUtilsNbtVal
 
     @Override
     public byte typeId() {
-        return 4;
+        return 6;
     }
 
     @Override
     public String typeName() {
-        return "TAG_Long";
+        return "TAG_Double";
     }
 
     @Override
@@ -62,7 +62,7 @@ public class LUtilsNbtLong extends LUtilsNbtValue<Long>  implements LUtilsNbtVal
                 ((valueBytes[5] & 0xFF) << 16) +
                 ((valueBytes[6] & 0xFF) << 8 ) +
                 ((valueBytes[7] & 0xFF)      );
-        return new NbtReturnValue(new String(nameStringBytes), new LUtilsNbtLong(value), valueOffset+8);
+        return new NbtReturnValue(new String(nameStringBytes), new LUtilsNbtDouble(Double.longBitsToDouble(value)), valueOffset+8);
     }
 
     @Override
@@ -86,31 +86,36 @@ public class LUtilsNbtLong extends LUtilsNbtValue<Long>  implements LUtilsNbtVal
                 ((valueBytes[5] & 0xFF) << 16) +
                 ((valueBytes[6] & 0xFF) << 8 ) +
                 ((valueBytes[7] & 0xFF)      );
-        return new NbtReturnValue(null, new LUtilsNbtLong(value), valueOffset+8);
+        return new NbtReturnValue(null, new LUtilsNbtDouble(Double.longBitsToDouble(value)), valueOffset+8);
     }
 
     @Override
-    public Long get() {
+    public Double get() {
         return value;
     }
 
     @Override
     public Object __index(LuaValue n) {
-        if (n.isstring() && n.checkjstring() == "value") return value;
-        return null;
+        if (!n.isstring()) return null;
+        return switch (n.tojstring()) {
+            case ("value") -> value;
+            default -> null;
+        };
     }
 
     @Override
-    public void set(Long v) {
+    public void set(Double v) {
         value = v;
     }
 
     @Override
     public void __newindex(LuaValue n, LuaValue value) {
         if (!n.isstring()) return;
-        if (!value.islong()) throw new RuntimeException("Value should be long");
+        if (!value.isnumber()) throw new RuntimeException("Value should be number");
         switch (n.tojstring()) {
-            case ("value") -> this.value = value.tolong();
+            case ("value") -> {
+                this.value = value.todouble();
+            }
         }
     }
 }

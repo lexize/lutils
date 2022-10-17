@@ -1,6 +1,6 @@
 package org.lexize.lutils.submodules;
 
-import org.lexize.lutils.regex.LUtilsRegexMatch;
+import org.lexize.lutils.submodules.regex.LUtilsRegexMatch;
 import org.luaj.vm2.LuaFunction;
 import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.LuaWhitelist;

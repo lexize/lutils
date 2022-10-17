@@ -1,4 +1,4 @@
-package org.lexize.lutils.streams;
+package org.lexize.lutils.submodules.streams;
 
 import org.moon.figura.lua.LuaNotNil;
 import org.moon.figura.lua.LuaWhitelist;

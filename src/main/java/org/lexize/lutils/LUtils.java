@@ -1,11 +1,18 @@
 package org.lexize.lutils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
+import net.minecraft.text.OrderedText;
 import org.apache.commons.lang3.ArrayUtils;
-import org.lexize.lutils.nbt.*;
-import org.lexize.lutils.regex.LUtilsRegexGroup;
-import org.lexize.lutils.regex.LUtilsRegexMatch;
-import org.lexize.lutils.streams.LUtilsInputStream;
-import org.lexize.lutils.streams.LUtilsOutputStream;
+import org.lexize.lutils.submodules.hud.builders.FillRenderTaskBuilder;
+import org.lexize.lutils.submodules.hud.builders.TextRenderTaskBuilder;
+import org.lexize.lutils.submodules.hud.builders.TextureRenderTaskBuilder;
+import org.lexize.lutils.submodules.nbt.*;
+import org.lexize.lutils.submodules.regex.LUtilsRegexGroup;
+import org.lexize.lutils.submodules.regex.LUtilsRegexMatch;
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.lexize.lutils.submodules.*;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
@@ -14,6 +21,8 @@ import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.FiguraAPI;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,6 +30,9 @@ import java.util.List;
 public class LUtils implements FiguraAPI {
     private Avatar _avatar;
     public static final String API_NAME = "lutils";
+    private static final Gson _json = new GsonBuilder().setPrettyPrinting().create();
+
+    private ExperimentalSettings experimentalSettings;
 
     @LuaWhitelist
     public LUtilsJson json = new LUtilsJson();
@@ -31,18 +43,25 @@ public class LUtils implements FiguraAPI {
     @LuaWhitelist
     public LUtilsMisc misc = new LUtilsMisc();
     @LuaWhitelist
+    public LUtilsHUD hud;
+    @LuaWhitelist
     public LUtilsHttp http;
+    @LuaWhitelist
+    public LUtilsNbt nbt;
     public LUtils() {
 
     }
 
     public LUtils(Avatar avatar) {
+        loadExperimentalSettings();
         _avatar = avatar;
         if(_avatar.isHost) {
             file = new LUtilsFile();
+            if (experimentalSettings.hud_submodule) hud = new LUtilsHUD(_avatar);
         }
+        if (experimentalSettings.http_submodule) http = new LUtilsHttp(_avatar);
+        if (experimentalSettings.nbt_submodule) nbt = new LUtilsNbt(_avatar);
         regex = new LUtilsRegex(_avatar);
-        http  = new LUtilsHttp(_avatar);
     }
 
     @LuaWhitelist
@@ -52,7 +71,9 @@ public class LUtils implements FiguraAPI {
           case "file" -> file;
           case "regex" -> regex;
           case "misc" -> misc;
+          case "hud" -> hud;
           case "http" -> http;
+          case "nbt" -> nbt;
           default -> null;
         };
     }
@@ -67,6 +88,10 @@ public class LUtils implements FiguraAPI {
     @Override
     public String getName() {
         return API_NAME;
+    }
+
+    public static Gson getJson() {
+        return _json;
     }
 
     @Override
@@ -102,7 +127,12 @@ public class LUtils implements FiguraAPI {
                 LUtilsNbtLong.class,
                 LUtilsNbtLongArray.class,
                 LUtilsNbtShort.class,
-                LUtilsNbtString.class
+                LUtilsNbtString.class,
+
+                LUtilsHUD.class,
+                FillRenderTaskBuilder.class,
+                TextRenderTaskBuilder.class,
+                TextureRenderTaskBuilder.class
         );
     }
 
@@ -194,5 +224,48 @@ public class LUtils implements FiguraAPI {
             }
             return cArr;
         }
+
+        public static String fromOrderedText(OrderedText text) {
+            StringBuilder builder = new StringBuilder();
+            text.accept((i,s,c) -> {
+                if (i != -1) builder.append((char) c);
+                return i != -1;
+            });
+            return builder.toString();
+        }
+    }
+
+    public void loadExperimentalSettings() {
+        File settingsFile = new File("lutils_experimental_settings.json");
+        if (!settingsFile.exists()) {
+            experimentalSettings = new ExperimentalSettings();
+            try {
+                FileOutputStream fos = new FileOutputStream(settingsFile);
+                String es = _json.toJson(experimentalSettings);
+                fos.write(es.getBytes(StandardCharsets.UTF_8));
+                fos.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            try {
+                FileInputStream fis = new FileInputStream(settingsFile);
+                String es = new String(fis.readAllBytes(), StandardCharsets.UTF_8);
+                fis.close();
+                experimentalSettings = _json.fromJson(es, ExperimentalSettings.class);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static class ExperimentalSettings {
+        @SerializedName("Turn on HTTP submodule")
+        public boolean http_submodule = false;
+        @SerializedName("Turn on HUD submodule")
+        public boolean hud_submodule = false;
+        @SerializedName("Turn on NBT submodule")
+        public boolean nbt_submodule = false;
     }
 }

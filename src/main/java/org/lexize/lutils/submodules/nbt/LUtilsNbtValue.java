@@ -1,4 +1,4 @@
-package org.lexize.lutils.nbt;
+package org.lexize.lutils.submodules.nbt;
 
 import org.lexize.lutils.LUtils;
 import org.luaj.vm2.LuaValue;

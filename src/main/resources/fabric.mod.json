@@ -15,6 +15,9 @@
       "org.lexize.lutils.LUtils"
     ]
   },
+  "mixins": [
+    "lutils.mixins.json"
+  ],
   "depends": {
     "fabric": "*",
     "figura": ">=0.1.0-rc.7"

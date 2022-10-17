@@ -2,21 +2,14 @@ package org.lexize.lutils.submodules;
 
 import org.lexize.lutils.LUtils;
 import org.lexize.lutils.LVarargs;
-import org.lexize.lutils.nbt.*;
+import org.lexize.lutils.submodules.nbt.*;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.moon.figura.FiguraMod;
+import org.luaj.vm2.Varargs;
 import org.moon.figura.avatar.Avatar;
-import org.moon.figura.lua.FiguraAPIManager;
 import org.moon.figura.lua.LuaNotNil;
 import org.moon.figura.lua.LuaTypeManager;
 import org.moon.figura.lua.LuaWhitelist;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 @LuaWhitelist
 public class LUtilsNbt {
@@ -93,10 +86,10 @@ public class LUtilsNbt {
     }
 
     @LuaWhitelist
-    public LVarargs fromBytes(@LuaNotNil LuaTable bytesTable) {
+    public Varargs fromBytes(@LuaNotNil LuaTable bytesTable) {
         byte[] bytes = LUtils.Utils.tableToByteArray(bytesTable);
         LUtilsNbtValue.NbtReturnValue val = LUtilsNbtValue.NbtType.Compound.typeGetFunction.apply(bytes, 0);
-        return new LVarargs(LuaValue.valueOf(val.name()), _ltm.javaToLua(val.value()));
+        return LuaValue.varargsOf(LuaValue.valueOf(val.name()), _ltm.javaToLua(val.value()));
     }
 
 }

@@ -1,6 +1,7 @@
 package org.lexize.lutils.submodules;
 
 import com.google.gson.*;
+import org.lexize.lutils.LUtils;
 import org.luaj.vm2.*;
 import org.moon.figura.lua.LuaWhitelist;
 
@@ -10,22 +11,18 @@ import java.util.Map;
 @LuaWhitelist
 public class LUtilsJson{
 
-    private Gson _json;
-
-    public LUtilsJson() {
-        _json = new GsonBuilder().setPrettyPrinting().create();
-    }
+    private Gson json = LUtils.getJson();
 
     @LuaWhitelist
     public LuaValue fromJson(String jsonString) {
-        JsonElement element = _json.fromJson(jsonString, JsonElement.class);
+        JsonElement element = json.fromJson(jsonString, JsonElement.class);
         return fromJsonElement(element);
     }
 
     @LuaWhitelist
     public String toJson(LuaValue value) {
         JsonElement element = toJsonElement(value);
-        return _json.toJson(element);
+        return json.toJson(element);
     }
 
     private LuaValue fromJsonElement(JsonElement element) {

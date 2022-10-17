@@ -1,4 +1,4 @@
-package org.lexize.lutils.regex;
+package org.lexize.lutils.submodules.regex;
 
 import org.moon.figura.lua.LuaWhitelist;
 

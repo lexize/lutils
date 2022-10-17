@@ -1,6 +1,5 @@
-package org.lexize.lutils.regex;
+package org.lexize.lutils.submodules.regex;
 
-import org.luaj.vm2.*;
 import org.moon.figura.lua.LuaWhitelist;
 
 import java.util.HashMap;
