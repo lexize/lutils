@@ -18,12 +18,15 @@ import org.moon.figura.model.FiguraModelPart;
 import org.moon.figura.model.rendering.texture.FiguraTexture;
 import org.moon.figura.model.rendering.texture.FiguraTextureSet;
 import org.moon.figura.utils.FiguraIdentifier;
+import org.moon.figura.utils.caching.CacheUtils;
 
 @LuaWhitelist
-public class TextureRenderTaskBuilder implements HUDRenderTaskBuilder{
+public class TextureRenderTaskBuilder extends HUDRenderTaskBuilder<TextureRenderTaskBuilder>{
+
+    private final static CacheUtils.Cache<TextureRenderTaskBuilder> CACHE = CacheUtils.getCache(TextureRenderTaskBuilder::new, 300);
 
     private final MinecraftClient mc;
-    private final Avatar _avatar;
+    private Avatar _avatar;
 
     public FiguraVec3 pos = FiguraVec3.of(0,0,0);
     public FiguraVec2 size;
@@ -34,9 +37,8 @@ public class TextureRenderTaskBuilder implements HUDRenderTaskBuilder{
 
     private TextureRenderTask task = new TextureRenderTask();
 
-    public TextureRenderTaskBuilder(Avatar avatar) {
+    public TextureRenderTaskBuilder() {
         mc = MinecraftClient.getInstance();
-        _avatar = avatar;
     }
 
     @LuaWhitelist
@@ -77,6 +79,7 @@ public class TextureRenderTaskBuilder implements HUDRenderTaskBuilder{
             case RESOURCE -> {
                 try {
                     Identifier id = new Identifier((String) texture);
+                    System.out.println(texture);
                     texture_id = mc.getResourceManager().getResource(id).isPresent() ? id : MissingSprite.getMissingSpriteId();
                 }
                 catch (Exception ignored) {}
@@ -114,7 +117,12 @@ public class TextureRenderTaskBuilder implements HUDRenderTaskBuilder{
                 };
             }
         }
-        texture = texture_id;
+        this.texture = texture_id;
+        return this;
+    }
+
+    private TextureRenderTaskBuilder texture(Identifier texture) {
+        this.texture = texture;
         return this;
     }
 
@@ -151,6 +159,7 @@ public class TextureRenderTaskBuilder implements HUDRenderTaskBuilder{
         if (uv2 == null) uv2 = FiguraVec2.of(1,1);
     }
 
+    @LuaWhitelist
     @Override
     public void draw() {
         replaceNullWithDefaults();
@@ -159,5 +168,35 @@ public class TextureRenderTaskBuilder implements HUDRenderTaskBuilder{
         }
         task.construct(pos,size,uv1,uv2,texture,color);
         LUtilsHUD.getGuiRenderTaskStack().push(task);
+    }
+
+    @LuaWhitelist
+    @Override
+    public TextureRenderTaskBuilder reset() {
+        pos = null;
+        size = null;
+        uv1 = uv2 = null;
+        texture = null;
+        color = null;
+        replaceNullWithDefaults();
+        return this;
+    }
+
+    @LuaWhitelist
+    @Override
+    public void free() {
+        CACHE.offerOld(this);
+    }
+
+    public static TextureRenderTaskBuilder of(Avatar avatar) {
+        TextureRenderTaskBuilder builder = CACHE.getFresh();
+        builder._avatar = avatar;
+        return builder;
+    }
+
+    @LuaWhitelist
+    @Override
+    protected Object clone() {
+        return of(_avatar).pos(pos).size(size).uv1(uv1).uv2(uv2).texture(texture).color(color);
     }
 }

@@ -6,9 +6,12 @@ import org.luaj.vm2.LuaError;
 import org.moon.figura.lua.LuaWhitelist;
 import org.moon.figura.math.vector.FiguraVec2;
 import org.moon.figura.math.vector.FiguraVec3;
+import org.moon.figura.utils.caching.CacheUtils;
 
 @LuaWhitelist
-public class TextRenderTaskBuilder implements HUDRenderTaskBuilder{
+public class TextRenderTaskBuilder extends HUDRenderTaskBuilder<TextRenderTaskBuilder>{
+
+    private final static CacheUtils.Cache<TextRenderTaskBuilder> CACHE = CacheUtils.getCache(TextRenderTaskBuilder::new, 300);
 
     public String text;
     public FiguraVec2 pos;
@@ -103,5 +106,35 @@ public class TextRenderTaskBuilder implements HUDRenderTaskBuilder{
         if (text == null) throw new LuaError("text cant be null!");
         task.construct(text, pos, color, shadow,mirror, size);
         LUtilsHUD.getGuiRenderTaskStack().push(task);
+    }
+
+
+    @LuaWhitelist
+    @Override
+    public TextRenderTaskBuilder reset() {
+        text = null;
+        pos = null;
+        color = null;
+        size = null;
+        shadow = null;
+        mirror = null;
+        replaceNullWithDefaults();
+        return this;
+    }
+
+    @LuaWhitelist
+    @Override
+    public void free() {
+        CACHE.offerOld(this);
+    }
+
+    @LuaWhitelist
+    @Override
+    protected Object clone() {
+        return of().text(text).color(color).size(size).shadow(shadow).mirror(mirror);
+    }
+
+    public static TextRenderTaskBuilder of() {
+        return CACHE.getFresh();
     }
 }

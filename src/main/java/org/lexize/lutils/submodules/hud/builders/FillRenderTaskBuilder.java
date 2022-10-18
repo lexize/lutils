@@ -7,9 +7,14 @@ import org.moon.figura.lua.LuaWhitelist;
 import org.moon.figura.math.vector.FiguraVec2;
 import org.moon.figura.math.vector.FiguraVec3;
 import org.moon.figura.math.vector.FiguraVec4;
+import org.moon.figura.utils.caching.CacheUtils;
+import org.moon.figura.utils.caching.CachedType;
 
 @LuaWhitelist
-public class FillRenderTaskBuilder implements HUDRenderTaskBuilder {
+public class FillRenderTaskBuilder extends HUDRenderTaskBuilder<FillRenderTaskBuilder> {
+
+    private final static CacheUtils.Cache<FillRenderTaskBuilder> CACHE = CacheUtils.getCache(FillRenderTaskBuilder::new, 300);
+
     public FiguraVec4 color = FiguraVec4.of(1,1,1,1);
     public FiguraVec3 pos = FiguraVec3.of();
     public FiguraVec2 size = FiguraVec2.of();
@@ -60,5 +65,31 @@ public class FillRenderTaskBuilder implements HUDRenderTaskBuilder {
         if (size == null || color == null) throw new LuaError("size and color cant be null!");
         task.construct(pos, size, color);
         LUtilsHUD.getGuiRenderTaskStack().push(task);
+    }
+
+    @LuaWhitelist
+    @Override
+    public FillRenderTaskBuilder reset() {
+        size = null;
+        pos = null;
+        color = null;
+        replaceNullWithDefaults();
+        return this;
+    }
+
+    @LuaWhitelist
+    @Override
+    public void free() {
+        CACHE.offerOld(this);
+    }
+
+    @LuaWhitelist
+    @Override
+    protected Object clone() {
+        return of().color(color).pos(pos).size(size);
+    }
+
+    public static FillRenderTaskBuilder of() {
+        return CACHE.getFresh();
     }
 }

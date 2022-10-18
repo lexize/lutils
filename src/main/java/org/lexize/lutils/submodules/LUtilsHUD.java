@@ -8,10 +8,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.util.Identifier;
 import org.lexize.lutils.LUtils;
-import org.lexize.lutils.submodules.hud.FillRenderTask;
-import org.lexize.lutils.submodules.hud.HUDRenderTask;
-import org.lexize.lutils.submodules.hud.TextRenderTask;
-import org.lexize.lutils.submodules.hud.TextureRenderTask;
+import org.lexize.lutils.submodules.hud.*;
 import org.lexize.lutils.submodules.hud.builders.FillRenderTaskBuilder;
 import org.lexize.lutils.submodules.hud.builders.TextRenderTaskBuilder;
 import org.lexize.lutils.submodules.hud.builders.TextureRenderTaskBuilder;
@@ -52,17 +49,27 @@ public class LUtilsHUD {
 
     @LuaWhitelist
     public FillRenderTaskBuilder fill() {
-        return new FillRenderTaskBuilder();
+        return FillRenderTaskBuilder.of();
     }
 
     @LuaWhitelist
     public TextRenderTaskBuilder text() {
-        return new TextRenderTaskBuilder();
+        return  TextRenderTaskBuilder.of();
     }
 
     @LuaWhitelist
     public TextureRenderTaskBuilder texture() {
-        return new TextureRenderTaskBuilder(_avatar);
+        return TextureRenderTaskBuilder.of(_avatar);
+    }
+
+    @LuaWhitelist
+    public void enableScissor(float x, float y, float width, float height) {
+        _hudRenderTaskStack.push(EnableScissorTask.of(x,y,width,height));
+    }
+
+    @LuaWhitelist
+    public void disableScissor() {
+        _hudRenderTaskStack.push(DisableScissorTask.of());
     }
 
     @LuaWhitelist
