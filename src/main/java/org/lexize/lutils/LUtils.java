@@ -20,6 +20,8 @@ import org.luaj.vm2.LuaValue;
 import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.FiguraAPI;
 import org.moon.figura.lua.LuaWhitelist;
+import org.moon.figura.trust.Trust;
+import org.moon.figura.trust.TrustManager;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -135,7 +137,6 @@ public class LUtils implements FiguraAPI {
                 TextureRenderTaskBuilder.class
         );
     }
-
 
     public static class Utils {
         public static byte[] tableToByteArray(LuaTable bytesTable) {

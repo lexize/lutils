@@ -5,11 +5,16 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
+import org.lexize.lutils.submodules.LUtilsHUD;
 import org.moon.figura.math.vector.FiguraVec2;
 import org.moon.figura.math.vector.FiguraVec3;
 import org.moon.figura.math.vector.FiguraVec4;
+import org.moon.figura.utils.caching.CacheUtils;
+import org.moon.figura.utils.caching.CachedType;
 
-public class TextureRenderTask implements HUDRenderTask {
+public class TextureRenderTask extends HUDRenderTask {
+
+    private static final CacheUtils.Cache<TextureRenderTask> CACHE = CacheUtils.getCache(TextureRenderTask::new, 300);
 
     public float x0,y0,x1,y1,z;
     public float u0,v0,u1,v1;
@@ -67,5 +72,19 @@ public class TextureRenderTask implements HUDRenderTask {
                 .color(r,g,b,a).next();
         BufferRenderer.drawWithShader(bufferBuilder.end());
         RenderSystem.disableBlend();
+    }
+
+    @Override
+    public HUDRenderTask reset() {
+        return this;
+    }
+
+    @Override
+    public void free() {
+        CACHE.offerOld(this);
+    }
+
+    public static TextureRenderTask of() {
+        return CACHE.getFresh();
     }
 }

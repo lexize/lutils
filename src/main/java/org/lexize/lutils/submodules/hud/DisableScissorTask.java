@@ -4,20 +4,18 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import org.moon.figura.utils.caching.CacheUtils;
-import org.moon.figura.utils.caching.CachedType;
 
-public class DisableScissorTask implements HUDRenderTask, CachedType<DisableScissorTask> {
+public class DisableScissorTask extends HUDRenderTask{
 
     private static final CacheUtils.Cache<DisableScissorTask> CACHE = CacheUtils.getCache(DisableScissorTask::new, 100);
 
     @Override
     public void render(MatrixStack matrixStack) {
         RenderSystem.disableScissor();
-        free();
     }
 
     @Override
-    public DisableScissorTask reset() {
+    public HUDRenderTask reset() {
         return this;
     }
 
@@ -27,7 +25,6 @@ public class DisableScissorTask implements HUDRenderTask, CachedType<DisableScis
     }
 
     public static DisableScissorTask of() {
-        DisableScissorTask scissorTask = CACHE.getFresh();
-        return scissorTask;
+        return CACHE.getFresh();
     }
 }

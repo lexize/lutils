@@ -1,28 +1,17 @@
 package org.lexize.lutils.submodules;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
-import net.minecraft.util.Identifier;
 import org.lexize.lutils.LUtils;
 import org.lexize.lutils.submodules.hud.*;
 import org.lexize.lutils.submodules.hud.builders.FillRenderTaskBuilder;
 import org.lexize.lutils.submodules.hud.builders.TextRenderTaskBuilder;
 import org.lexize.lutils.submodules.hud.builders.TextureRenderTaskBuilder;
 import org.moon.figura.avatar.Avatar;
-import org.moon.figura.lua.LuaNotNil;
 import org.moon.figura.lua.LuaWhitelist;
-import org.moon.figura.math.vector.FiguraVec2;
-import org.moon.figura.math.vector.FiguraVec3;
-import org.moon.figura.math.vector.FiguraVec4;
-import org.moon.figura.mixin.render.layers.elytra.ElytraLayerAccessor;
-import org.moon.figura.model.FiguraModelPart;
-import org.moon.figura.model.rendering.texture.FiguraTexture;
-import org.moon.figura.model.rendering.texture.FiguraTextureSet;
-import org.moon.figura.utils.FiguraIdentifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,17 +38,17 @@ public class LUtilsHUD {
 
     @LuaWhitelist
     public FillRenderTaskBuilder fill() {
-        return FillRenderTaskBuilder.of();
+        return new FillRenderTaskBuilder();
     }
 
     @LuaWhitelist
     public TextRenderTaskBuilder text() {
-        return  TextRenderTaskBuilder.of();
+        return new TextRenderTaskBuilder();
     }
 
     @LuaWhitelist
     public TextureRenderTaskBuilder texture() {
-        return TextureRenderTaskBuilder.of(_avatar);
+        return new TextureRenderTaskBuilder(_avatar);
     }
 
     @LuaWhitelist

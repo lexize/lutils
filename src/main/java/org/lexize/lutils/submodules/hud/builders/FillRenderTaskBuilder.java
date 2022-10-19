@@ -1,5 +1,6 @@
 package org.lexize.lutils.submodules.hud.builders;
 
+import net.minecraft.client.util.math.MatrixStack;
 import org.lexize.lutils.submodules.LUtilsHUD;
 import org.lexize.lutils.submodules.hud.FillRenderTask;
 import org.luaj.vm2.LuaError;
@@ -11,15 +12,14 @@ import org.moon.figura.utils.caching.CacheUtils;
 import org.moon.figura.utils.caching.CachedType;
 
 @LuaWhitelist
-public class FillRenderTaskBuilder extends HUDRenderTaskBuilder<FillRenderTaskBuilder> {
+public class FillRenderTaskBuilder extends HUDRenderTaskBuilder {
 
-    private final static CacheUtils.Cache<FillRenderTaskBuilder> CACHE = CacheUtils.getCache(FillRenderTaskBuilder::new, 300);
+    public FillRenderTaskBuilder() {}
+
 
     public FiguraVec4 color = FiguraVec4.of(1,1,1,1);
     public FiguraVec3 pos = FiguraVec3.of();
     public FiguraVec2 size = FiguraVec2.of();
-
-    private FillRenderTask task = new FillRenderTask();
 
     @LuaWhitelist
     public FillRenderTaskBuilder color(FiguraVec4 color) {
@@ -62,34 +62,19 @@ public class FillRenderTaskBuilder extends HUDRenderTaskBuilder<FillRenderTaskBu
     @LuaWhitelist
     @Override
     public void draw() {
+        replaceNullWithDefaults();
         if (size == null || color == null) throw new LuaError("size and color cant be null!");
+        FillRenderTask task = FillRenderTask.of();
         task.construct(pos, size, color);
         LUtilsHUD.getGuiRenderTaskStack().push(task);
     }
 
     @LuaWhitelist
-    @Override
-    public FillRenderTaskBuilder reset() {
-        size = null;
-        pos = null;
-        color = null;
-        replaceNullWithDefaults();
-        return this;
+    public FillRenderTaskBuilder copy() {
+        return new FillRenderTaskBuilder()
+                .color(color != null ? color.copy() : null)
+                .pos(pos != null ? pos.copy() : null)
+                .size(size != null ? size.copy() : null);
     }
 
-    @LuaWhitelist
-    @Override
-    public void free() {
-        CACHE.offerOld(this);
-    }
-
-    @LuaWhitelist
-    @Override
-    protected Object clone() {
-        return of().color(color).pos(pos).size(size);
-    }
-
-    public static FillRenderTaskBuilder of() {
-        return CACHE.getFresh();
-    }
 }

@@ -3,6 +3,7 @@ package org.lexize.lutils.submodules.hud.builders;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.texture.MissingSprite;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.lexize.lutils.submodules.LUtilsHUD;
 import org.lexize.lutils.submodules.hud.TextureRenderTask;
@@ -21,10 +22,7 @@ import org.moon.figura.utils.FiguraIdentifier;
 import org.moon.figura.utils.caching.CacheUtils;
 
 @LuaWhitelist
-public class TextureRenderTaskBuilder extends HUDRenderTaskBuilder<TextureRenderTaskBuilder>{
-
-    private final static CacheUtils.Cache<TextureRenderTaskBuilder> CACHE = CacheUtils.getCache(TextureRenderTaskBuilder::new, 300);
-
+public class TextureRenderTaskBuilder extends HUDRenderTaskBuilder{
     private final MinecraftClient mc;
     private Avatar _avatar;
 
@@ -35,9 +33,8 @@ public class TextureRenderTaskBuilder extends HUDRenderTaskBuilder<TextureRender
     public FiguraVec4 color = FiguraVec4.of(1,1,1,1);
     public Identifier texture;
 
-    private TextureRenderTask task = new TextureRenderTask();
-
-    public TextureRenderTaskBuilder() {
+    public TextureRenderTaskBuilder(Avatar avatar) {
+        _avatar = avatar;
         mc = MinecraftClient.getInstance();
     }
 
@@ -75,6 +72,7 @@ public class TextureRenderTaskBuilder extends HUDRenderTaskBuilder<TextureRender
     public TextureRenderTaskBuilder texture(@LuaNotNil String type, Object texture) {
         var overrideType = FiguraTextureSet.OverrideType.valueOf(type.toUpperCase());
         Identifier texture_id = MissingSprite.getMissingSpriteId();
+        System.out.println(texture);
         switch (overrideType) {
             case RESOURCE -> {
                 try {
@@ -166,37 +164,20 @@ public class TextureRenderTaskBuilder extends HUDRenderTaskBuilder<TextureRender
         if (size == null || texture == null) {
             throw new LuaError("size and texture cant be null!");
         }
+        TextureRenderTask task = TextureRenderTask.of();
         task.construct(pos,size,uv1,uv2,texture,color);
         LUtilsHUD.getGuiRenderTaskStack().push(task);
     }
 
-    @LuaWhitelist
-    @Override
-    public TextureRenderTaskBuilder reset() {
-        pos = null;
-        size = null;
-        uv1 = uv2 = null;
-        texture = null;
-        color = null;
-        replaceNullWithDefaults();
-        return this;
-    }
 
     @LuaWhitelist
-    @Override
-    public void free() {
-        CACHE.offerOld(this);
-    }
-
-    public static TextureRenderTaskBuilder of(Avatar avatar) {
-        TextureRenderTaskBuilder builder = CACHE.getFresh();
-        builder._avatar = avatar;
-        return builder;
-    }
-
-    @LuaWhitelist
-    @Override
-    protected Object clone() {
-        return of(_avatar).pos(pos).size(size).uv1(uv1).uv2(uv2).texture(texture).color(color);
+    public TextureRenderTaskBuilder copy() {
+        return new TextureRenderTaskBuilder(_avatar)
+                .pos(pos != null ? pos.copy() : null)
+                .size(size != null ? size.copy() : null)
+                .uv1(uv1 != null ? uv1.copy() : null)
+                .uv2(uv2 != null ? uv2.copy() : null)
+                .texture(texture != null ? new Identifier(texture.getNamespace(),texture.getPath()) : null)
+                .color(color != null ? color.copy() : null);
     }
 }

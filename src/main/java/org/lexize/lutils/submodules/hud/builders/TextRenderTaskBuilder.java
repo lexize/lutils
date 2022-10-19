@@ -1,5 +1,6 @@
 package org.lexize.lutils.submodules.hud.builders;
 
+import net.minecraft.client.util.math.MatrixStack;
 import org.lexize.lutils.submodules.LUtilsHUD;
 import org.lexize.lutils.submodules.hud.TextRenderTask;
 import org.luaj.vm2.LuaError;
@@ -9,18 +10,16 @@ import org.moon.figura.math.vector.FiguraVec3;
 import org.moon.figura.utils.caching.CacheUtils;
 
 @LuaWhitelist
-public class TextRenderTaskBuilder extends HUDRenderTaskBuilder<TextRenderTaskBuilder>{
-
-    private final static CacheUtils.Cache<TextRenderTaskBuilder> CACHE = CacheUtils.getCache(TextRenderTaskBuilder::new, 300);
-
+public class TextRenderTaskBuilder extends HUDRenderTaskBuilder{
     public String text;
-    public FiguraVec2 pos;
+    public FiguraVec3 pos;
     public FiguraVec3 color = FiguraVec3.of(1,1,1);
     public Boolean shadow = false;
     public Boolean mirror = false;
     public Float size = 1f;
 
-    private TextRenderTask task = new TextRenderTask();
+    public TextRenderTaskBuilder() {
+    }
 
 
     @LuaWhitelist
@@ -30,7 +29,7 @@ public class TextRenderTaskBuilder extends HUDRenderTaskBuilder<TextRenderTaskBu
     }
 
     @LuaWhitelist
-    public TextRenderTaskBuilder pos(FiguraVec2 pos) {
+    public TextRenderTaskBuilder pos(FiguraVec3 pos) {
         this.pos = pos;
         return this;
     }
@@ -65,7 +64,7 @@ public class TextRenderTaskBuilder extends HUDRenderTaskBuilder<TextRenderTaskBu
     }
 
     @LuaWhitelist
-    public FiguraVec2 getPos() {
+    public FiguraVec3 getPos() {
         return pos;
     }
 
@@ -92,7 +91,7 @@ public class TextRenderTaskBuilder extends HUDRenderTaskBuilder<TextRenderTaskBu
 
     @Override
     public void replaceNullWithDefaults() {
-        if (pos == null) pos = FiguraVec2.of();
+        if (pos == null) pos = FiguraVec3.of();
         if (color == null) color = FiguraVec3.of(1,1,1);
         if (size == null) size = 1f;
         if (shadow == null) shadow = false;
@@ -104,37 +103,20 @@ public class TextRenderTaskBuilder extends HUDRenderTaskBuilder<TextRenderTaskBu
     public void draw() {
         replaceNullWithDefaults();
         if (text == null) throw new LuaError("text cant be null!");
+        TextRenderTask task = TextRenderTask.of();
         task.construct(text, pos, color, shadow,mirror, size);
         LUtilsHUD.getGuiRenderTaskStack().push(task);
     }
 
-
     @LuaWhitelist
-    @Override
-    public TextRenderTaskBuilder reset() {
-        text = null;
-        pos = null;
-        color = null;
-        size = null;
-        shadow = null;
-        mirror = null;
+    public TextRenderTaskBuilder copy() {
         replaceNullWithDefaults();
-        return this;
-    }
-
-    @LuaWhitelist
-    @Override
-    public void free() {
-        CACHE.offerOld(this);
-    }
-
-    @LuaWhitelist
-    @Override
-    protected Object clone() {
-        return of().text(text).color(color).size(size).shadow(shadow).mirror(mirror);
-    }
-
-    public static TextRenderTaskBuilder of() {
-        return CACHE.getFresh();
+        return new TextRenderTaskBuilder()
+                .text( text != null ? String.copyValueOf(text.toCharArray()) : null)
+                .color(color != null ? color.copy() : null)
+                .pos(pos != null ? pos.copy() : null)
+                .size(size)
+                .shadow(shadow)
+                .mirror(mirror);
     }
 }
