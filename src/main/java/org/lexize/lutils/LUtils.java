@@ -50,6 +50,8 @@ public class LUtils implements FiguraAPI {
     public LUtilsHttp http;
     @LuaWhitelist
     public LUtilsNbt nbt;
+
+    public LUtilsTestClass test = new LUtilsTestClass();
     public LUtils() {
 
     }
@@ -76,6 +78,7 @@ public class LUtils implements FiguraAPI {
           case "hud" -> hud;
           case "http" -> http;
           case "nbt" -> nbt;
+          case "test" -> test;
           default -> null;
         };
     }
@@ -135,6 +138,13 @@ public class LUtils implements FiguraAPI {
                 FillRenderTaskBuilder.class,
                 TextRenderTaskBuilder.class,
                 TextureRenderTaskBuilder.class
+        );
+    }
+
+    @Override
+    public Collection<Trust> customTrust() {
+        return List.of(
+                new Trust("http",0,0,1,1,1)
         );
     }
 
