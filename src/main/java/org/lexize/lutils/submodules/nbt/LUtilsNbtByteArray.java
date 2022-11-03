@@ -1,10 +1,15 @@
 package org.lexize.lutils.submodules.nbt;
 
 import org.lexize.lutils.LUtils;
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 @LuaWhitelist
@@ -37,6 +42,19 @@ public class LUtilsNbtByteArray extends LUtilsNbtValue<byte[]> implements LUtils
     }
 
     @Override
+    public void writePureData(LUtilsOutputStream luos) throws IOException {
+        OutputStream os = luos.getOutputStream();
+        byte[] prefix = new byte[] {
+                (byte) ((value.length >> 24) & 0xFF),
+                (byte) ((value.length >> 16) & 0xFF),
+                (byte) ((value.length >> 8) & 0xFF),
+                (byte) (value.length & 0xFF)
+        };
+        os.write(prefix);
+        os.write(value);
+    }
+
+    @Override
     public byte typeId() {
         return 7;
     }
@@ -60,6 +78,23 @@ public class LUtilsNbtByteArray extends LUtilsNbtValue<byte[]> implements LUtils
     }
 
     @Override
+    public NbtReturnValue getValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] nameLengthBytes = is.readNBytes(2);
+            int nameLength = ((nameLengthBytes[0]) << 8) + (nameLengthBytes[1]);
+            byte[] nameBytes = is.readNBytes(nameLength);
+            byte[] arrayLengthBytes = is.readNBytes(4);
+            int arrayLength = ((arrayLengthBytes[0] & 0xFF) << 24) + ((arrayLengthBytes[1] & 0xFF) << 16) +
+                    ((arrayLengthBytes[2] & 0xFF) << 8) + ((arrayLengthBytes[3] & 0xFF));
+            byte[] array = is.readNBytes(arrayLength);
+            return new NbtReturnValue<>(new String(nameBytes), new LUtilsNbtByteArray(array), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public NbtReturnValue getPureValue(byte[] bytes, int offset) {
         int prefixOffset = offset;
         byte[] arrayLengthBytes = Arrays.copyOfRange(bytes, prefixOffset, prefixOffset+4);
@@ -68,6 +103,20 @@ public class LUtilsNbtByteArray extends LUtilsNbtValue<byte[]> implements LUtils
         int valueOffset = prefixOffset + 4;
         byte[] array = Arrays.copyOfRange(bytes, valueOffset, valueOffset+arrayLength);
         return new NbtReturnValue<>(null, new LUtilsNbtByteArray(array), valueOffset+arrayLength);
+    }
+
+    @Override
+    public NbtReturnValue getPureValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] arrayLengthBytes = is.readNBytes(4);
+            int arrayLength = ((arrayLengthBytes[0] & 0xFF) << 24) + ((arrayLengthBytes[1] & 0xFF) << 16) +
+                    ((arrayLengthBytes[2] & 0xFF) << 8) + ((arrayLengthBytes[3] & 0xFF));
+            byte[] array = is.readNBytes(arrayLength);
+            return new NbtReturnValue<>(null, new LUtilsNbtByteArray(array), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -1,0 +1,733 @@
+{
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtList": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtList",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtInt": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtInt",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.LUtilsNbt": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtValue",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          },
+          {
+            "type": "java.lang.String",
+            "name": "arg1",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.luaj.vm2.LuaTable",
+        "name": "toBytes",
+        "description": [
+          "Converts given tag to bytes table"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.lexize.lutils.submodules.streams.LUtilsInputStream",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "java.lang.Object",
+        "name": "fromStream",
+        "description": [
+          "Reads tag data from input stream"
+        ],
+        "properties": {
+          "use_varargs": true,
+          "varargs": [
+            "org.lexize.lutils.submodules.nbt.LUtilsNbtValue",
+            "java.lang.String"
+          ]
+        }
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "int",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtByte",
+        "name": "nbtByte",
+        "description": [
+          "Creates Byte tag by given value"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "int",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtShort",
+        "name": "nbtShort",
+        "description": [
+          "Creates Short tag by given value"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "int",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtInt",
+        "name": "nbtInt",
+        "description": [
+          "Creates Int tag by given value"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "long",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtLong",
+        "name": "nbtLong",
+        "description": [
+          "Creates Long tag by given value"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "float",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtFloat",
+        "name": "nbtFloat",
+        "description": [
+          "Creates Float tag by given value"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "double",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtDouble",
+        "name": "nbtDouble",
+        "description": [
+          "Creates Double tag by given value"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "java.lang.String",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtString",
+        "name": "nbtString",
+        "description": [
+          "Creates String tag by given value"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.luaj.vm2.LuaTable",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtCompound",
+        "name": "nbtCompound",
+        "description": [
+          "Creates Compound tag by given table"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.luaj.vm2.LuaTable",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtList",
+        "name": "nbtList",
+        "description": [
+          "Creates List tag by given table"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.luaj.vm2.LuaTable",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtByteArray",
+        "name": "nbtByteArray",
+        "description": [
+          "Creates ByteArray tag by given table"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.luaj.vm2.LuaTable",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtIntArray",
+        "name": "nbtIntArray",
+        "description": [
+          "Creates IntArray tag by given table"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.luaj.vm2.LuaTable",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtLongArray",
+        "name": "nbtLongArray",
+        "description": [
+          "Creates LongArray tag by given table"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.luaj.vm2.LuaTable",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          },
+          {
+            "type": "java.lang.Integer",
+            "name": "arg1",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "java.lang.Object",
+        "name": "fromBytes",
+        "description": [
+          "Converts bytes table to tag"
+        ],
+        "properties": {
+          "use_varargs": true,
+          "varargs": [
+            "org.lexize.lutils.submodules.nbt.LUtilsNbtValue",
+            "java.lang.String",
+            "java.lang.Integer"
+          ]
+        }
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "parameters": [
+          {
+            "type": "org.lexize.lutils.submodules.nbt.LUtilsNbtValue",
+            "name": "arg0",
+            "description": [],
+            "properties": {}
+          },
+          {
+            "type": "org.lexize.lutils.submodules.streams.LUtilsOutputStream",
+            "name": "arg1",
+            "description": [],
+            "properties": {}
+          },
+          {
+            "type": "java.lang.String",
+            "name": "arg2",
+            "description": [],
+            "properties": {}
+          }
+        ],
+        "type": "void",
+        "name": "toStream",
+        "description": [
+          "Writes tag data into output stream"
+        ],
+        "properties": {}
+      }
+    ],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.LUtilsNbt",
+    "description": [
+      "NBT submodule of LUtils"
+    ],
+    "properties": {}
+  },
+  "org.lexize.lutils.LUtils": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "type": "org.lexize.lutils.submodules.LUtilsJson",
+        "name": "json",
+        "description": [
+          "JSON submodule of LUtils"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "type": "org.lexize.lutils.submodules.LUtilsFile",
+        "name": "file",
+        "description": [
+          "File submodule of LUtils"
+        ],
+        "properties": {
+          "important": "Always NIL if running not in host instance of script."
+        }
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "type": "org.lexize.lutils.submodules.LUtilsRegex",
+        "name": "regex",
+        "description": [
+          "Regex submodule of LUtils"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "type": "org.lexize.lutils.submodules.LUtilsMisc",
+        "name": "misc",
+        "description": [
+          "Misc submodule of LUtils"
+        ],
+        "properties": {}
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "type": "org.lexize.lutils.submodules.LUtilsHUD",
+        "name": "hud",
+        "description": [
+          "HUD submodule of LUtils"
+        ],
+        "properties": {
+          "important": "Always NIL if running not in host instance of script."
+        }
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "type": "org.lexize.lutils.submodules.LUtilsHttp",
+        "name": "http",
+        "description": [
+          "HTTP submodule of LUtils"
+        ],
+        "properties": {
+          "important": "Experimental submodule"
+        }
+      },
+      {
+        "modifiers": [
+          "PUBLIC"
+        ],
+        "type": "org.lexize.lutils.submodules.LUtilsNbt",
+        "name": "nbt",
+        "description": [
+          "NBT submodule of LUtils"
+        ],
+        "properties": {
+          "important": "Experimental submodule"
+        }
+      }
+    ],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.LUtils",
+    "description": [
+      "Main class of LUtils"
+    ],
+    "properties": {
+      "example_code": "local json \u003d lutils.json; -- Getting JSON submodule\nlocal regex \u003d lutils.regex; -- Getting Regex submodule\nlocal file \u003d lutils.file; -- Getting File submodule\nlocal misc \u003d lutils.misc; -- Getting Misc submodule\nlocal hud \u003d lutils.hud; -- Getting HUD submodule\nlocal nbt \u003d lutils.nbt; -- Getting NBT submodule\nlocal http \u003d lutils.http; -- Getting HTTP submodule"
+    }
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtString": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtString",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.regex.LUtilsRegexGroup": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.regex.LUtilsRegexGroup",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.LUtilsHttp": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.LUtilsHttp",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.LUtilsHUD": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.LUtilsHUD",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.streams.LUtilsInputStream": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.streams.LUtilsInputStream",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtByte": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtByte",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.streams.LUtilsOutputStream": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.streams.LUtilsOutputStream",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.hud.builders.FillRenderTaskBuilder": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.hud.builders.FillRenderTaskBuilder",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.LUtilsFile": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.LUtilsFile",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtCompound": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtCompound",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtIntArray": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtIntArray",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.hud.builders.TextRenderTaskBuilder": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.hud.builders.TextRenderTaskBuilder",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtLong": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtLong",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtShort": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtShort",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.LUtilsMisc": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.LUtilsMisc",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtByteArray": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtByteArray",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtDouble": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtDouble",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.LUtilsJson": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.LUtilsJson",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtFloat": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtFloat",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.LUtilsRegex": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.LUtilsRegex",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.hud.builders.TextureRenderTaskBuilder": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.hud.builders.TextureRenderTaskBuilder",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.regex.LUtilsRegexMatch": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.regex.LUtilsRegexMatch",
+    "description": [],
+    "properties": {}
+  },
+  "org.lexize.lutils.submodules.nbt.LUtilsNbtLongArray": {
+    "modifiers": [
+      "PUBLIC"
+    ],
+    "fields": [],
+    "methods": [],
+    "subclasses": [],
+    "name": "org.lexize.lutils.submodules.nbt.LUtilsNbtLongArray",
+    "description": [],
+    "properties": {}
+  }
+}

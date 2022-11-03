@@ -54,7 +54,7 @@ public class TextureRenderTask extends HUDRenderTask {
     public void render(MatrixStack matrixStack) {
         Matrix4f matrix = matrixStack.peek().getPositionMatrix().copy();
         RenderSystem.setShaderTexture(0, texture_id);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.enableBlend();
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);

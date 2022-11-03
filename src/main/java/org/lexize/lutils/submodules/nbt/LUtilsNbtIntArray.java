@@ -1,10 +1,15 @@
 package org.lexize.lutils.submodules.nbt;
 
 import org.lexize.lutils.LUtils;
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 @LuaWhitelist
@@ -51,6 +56,28 @@ public class LUtilsNbtIntArray extends LUtilsNbtValue<int[]> implements LUtilsNb
     }
 
     @Override
+    public void writePureData(LUtilsOutputStream luos) throws IOException {
+        OutputStream os = luos.getOutputStream();
+        byte[] prefix = new byte[] {
+                (byte) ((value.length >> 24) & 0xFF),
+                (byte) ((value.length >> 16) & 0xFF),
+                (byte) ((value.length >> 8) & 0xFF),
+                (byte) (value.length & 0xFF),
+        };
+        os.write(prefix);
+        for (int i = 0; i < value.length; i++) {
+            int v = value[i];
+            byte[] valueArray = new byte[]{
+                    (byte) ((v >> 24) & 0xFF),
+                    (byte) ((v >> 16) & 0xFF),
+                    (byte) ((v >> 8) & 0xFF),
+                    (byte) (v & 0xFF),
+            };
+            os.write(valueArray);
+        }
+    }
+
+    @Override
     public byte typeId() {
         return 11;
     }
@@ -84,6 +111,31 @@ public class LUtilsNbtIntArray extends LUtilsNbtValue<int[]> implements LUtilsNb
     }
 
     @Override
+    public NbtReturnValue getValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] nameLengthBytes = is.readNBytes(2);
+            int nameLength = ((nameLengthBytes[0]) << 8) + (nameLengthBytes[1]);
+            byte[] nameBytes = is.readNBytes(nameLength);
+            byte[] arrayLengthBytes = is.readNBytes(4);
+            int length = ((arrayLengthBytes[0] & 0xFF) << 24) + ((arrayLengthBytes[1] & 0xFF) << 16) +
+                    ((arrayLengthBytes[2] & 0xFF) << 8) + ((arrayLengthBytes[3] & 0xFF));
+
+            int[] values = new int[length];
+
+            for (int i = 0; i < length; i++) {
+                byte[] valBytes = is.readNBytes(4);
+                int v = ((valBytes[0] & 0xFF) << 24) + ((valBytes[1] & 0xFF) << 16) +
+                        ((valBytes[2] & 0xFF) << 8) + ((valBytes[3] & 0xFF));
+                values[i] = v;
+            }
+            return new NbtReturnValue<>(new String(nameBytes), new LUtilsNbtIntArray(values), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public NbtReturnValue getPureValue(byte[] bytes, int offset) {
         int length = ((bytes[offset] & 0xFF) << 24) + ((bytes[offset+1] & 0xFF) << 16) +
                 ((bytes[offset+2] & 0xFF) << 8) + ((bytes[offset+3] & 0xFF));
@@ -100,6 +152,28 @@ public class LUtilsNbtIntArray extends LUtilsNbtValue<int[]> implements LUtilsNb
         }
 
         return new NbtReturnValue<>(null, new LUtilsNbtIntArray(values), valueOffset);
+    }
+
+    @Override
+    public NbtReturnValue getPureValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] arrayLengthBytes = is.readNBytes(4);
+            int length = ((arrayLengthBytes[0] & 0xFF) << 24) + ((arrayLengthBytes[1] & 0xFF) << 16) +
+                    ((arrayLengthBytes[2] & 0xFF) << 8) + ((arrayLengthBytes[3] & 0xFF));
+
+            int[] values = new int[length];
+
+            for (int i = 0; i < length; i++) {
+                byte[] valBytes = is.readNBytes(4);
+                int v = ((valBytes[0] & 0xFF) << 24) + ((valBytes[1] & 0xFF) << 16) +
+                        ((valBytes[2] & 0xFF) << 8) + ((valBytes[3] & 0xFF));
+                values[i] = v;
+            }
+            return new NbtReturnValue<>(null, new LUtilsNbtIntArray(values), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

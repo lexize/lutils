@@ -1,8 +1,12 @@
 package org.lexize.lutils.submodules.nbt;
 
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 @LuaWhitelist
@@ -19,6 +23,14 @@ public class LUtilsNbtShort extends LUtilsNbtValue<Short> implements LUtilsNbtVa
                 (byte) ((value >> 8) & 0xFF),
                 (byte) (value & 0xFF)
         };
+    }
+
+    @Override
+    public void writePureData(LUtilsOutputStream luos) throws IOException {
+        luos.getOutputStream().write(new byte[] {
+                (byte) ((value >> 8) & 0xFF),
+                (byte) (value & 0xFF)
+        });
     }
 
     @Override
@@ -46,6 +58,22 @@ public class LUtilsNbtShort extends LUtilsNbtValue<Short> implements LUtilsNbtVa
     }
 
     @Override
+    public NbtReturnValue getValue(LUtilsInputStream stream){
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] nameLengthBytes = is.readNBytes(2);
+            int nameLength = ((nameLengthBytes[0] << 8) + (nameLengthBytes[1]));
+            byte[] nameStringBytes = is.readNBytes(nameLength);
+            byte[] valueBytes = is.readNBytes(2);
+            short value = (short) (((valueBytes[0] & 0xFF) << 8) +
+                    ((valueBytes[1] & 0xFF)));
+            return new NbtReturnValue(new String(nameStringBytes), new LUtilsNbtShort(value), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public NbtReturnValue getPureValue(byte[] bytes, int offset) {
         int valueOffset = offset;
         byte[] valueBytes = new byte[] {
@@ -55,6 +83,18 @@ public class LUtilsNbtShort extends LUtilsNbtValue<Short> implements LUtilsNbtVa
         short value = (short) (((valueBytes[0] & 0xFF) << 8) +
                 ((valueBytes[1] & 0xFF)));
         return new NbtReturnValue("", new LUtilsNbtShort(value), valueOffset+2);
+    }
+
+    @Override
+    public NbtReturnValue getPureValue(LUtilsInputStream stream){
+        try {
+            byte[] valueBytes = stream.getInputStream().readNBytes(2);
+            short value = (short) (((valueBytes[0] & 0xFF) << 8) +
+                    ((valueBytes[1] & 0xFF)));
+            return new NbtReturnValue(null, new LUtilsNbtShort(value), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

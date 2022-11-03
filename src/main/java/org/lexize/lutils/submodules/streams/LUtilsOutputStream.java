@@ -23,4 +23,8 @@ public class LUtilsOutputStream <T extends OutputStream>{
     public void close() throws IOException {
         _outputStream.close();
     }
+
+    public T getOutputStream() {
+        return _outputStream;
+    }
 }

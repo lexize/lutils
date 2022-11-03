@@ -1,10 +1,15 @@
 package org.lexize.lutils.submodules.nbt;
 
 import org.lexize.lutils.LUtils;
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,6 +65,20 @@ public class LUtilsNbtList extends LUtilsNbtValue<List<LUtilsNbtValue>> {
     }
 
     @Override
+    public void writePureData(LUtilsOutputStream luos) throws IOException {
+        OutputStream os = luos.getOutputStream();
+        int length = value.size();
+        byte[] prefix = new byte[] {
+                containedTypeId(),
+                (byte) ((length >> 24) & 0xFF), (byte) ((length >> 16) & 0xFF), (byte) ((length >> 8) & 0xFF), (byte) (length & 0xFF)
+        };
+        os.write(prefix);
+        for (int i = 0; i < length; i++) {
+            value.get(i).writePureData(luos);
+        }
+    }
+
+    @Override
     public byte typeId() {
         return 9;
     }
@@ -89,6 +108,29 @@ public class LUtilsNbtList extends LUtilsNbtValue<List<LUtilsNbtValue>> {
     }
 
     @Override
+    public NbtReturnValue getValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] nameLengthBytes = is.readNBytes(2);
+            int nameLength = ((nameLengthBytes[0]) << 8) + (nameLengthBytes[1]);
+            byte[] nameBytes = is.readNBytes(nameLength);
+            NbtType type = NbtType.getById(is.read());
+
+            byte[] elementCountBytes = is.readNBytes(4);
+            int elementCount = ((elementCountBytes[0] & 0xFF) << 24) + ((elementCountBytes[1] & 0xFF) << 16) +
+                    ((elementCountBytes[2] & 0xFF) << 8) + ((elementCountBytes[3] & 0xFF));
+            LUtilsNbtList nbtList = new LUtilsNbtList();
+            for (int i = 0; i < elementCount; i++) {
+                NbtReturnValue val = type.typeGetPureFromStreamFunction.apply(stream);
+                nbtList.add(val.value());
+            }
+            return new NbtReturnValue<>(new String(nameBytes), nbtList, 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public NbtReturnValue getPureValue(byte[] bytes, int offset) {
         int valueOffset = offset;
         NbtType type = NbtType.getById(bytes[valueOffset]);
@@ -103,6 +145,26 @@ public class LUtilsNbtList extends LUtilsNbtValue<List<LUtilsNbtValue>> {
             elementOffset = val.newOffset();
         }
         return new NbtReturnValue<>(null, nbtList, elementOffset);
+    }
+
+    @Override
+    public NbtReturnValue getPureValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            NbtType type = NbtType.getById(is.read());
+
+            byte[] elementCountBytes = is.readNBytes(4);
+            int elementCount = ((elementCountBytes[0] & 0xFF) << 24) + ((elementCountBytes[1] & 0xFF) << 16) +
+                    ((elementCountBytes[2] & 0xFF) << 8) + ((elementCountBytes[3] & 0xFF));
+            LUtilsNbtList nbtList = new LUtilsNbtList();
+            for (int i = 0; i < elementCount; i++) {
+                NbtReturnValue val = type.typeGetPureFromStreamFunction.apply(stream);
+                nbtList.add(val.value());
+            }
+            return new NbtReturnValue<>(null, nbtList, 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -131,7 +193,7 @@ public class LUtilsNbtList extends LUtilsNbtValue<List<LUtilsNbtValue>> {
 
     @LuaWhitelist
     public boolean add(LUtilsNbtValue element) {
-        if(containedTypeId() != 0 && element.typeId() == containedTypeId()) {
+        if(containedTypeId() != 0 && element.typeId() != containedTypeId()) {
             NbtType firstType = NbtType.getById(containedTypeId());
             NbtType secondType = NbtType.getById(element.typeId());
             throw WrongTypeExceptionBuilder.apply(firstType,secondType);
@@ -142,7 +204,7 @@ public class LUtilsNbtList extends LUtilsNbtValue<List<LUtilsNbtValue>> {
 
     @LuaWhitelist
     public LUtilsNbtValue set(int i, LUtilsNbtValue v) {
-        if(containedTypeId() != 0 && v.typeId() == containedTypeId()) {
+        if(containedTypeId() != 0 && v.typeId() != containedTypeId()) {
             NbtType firstType = NbtType.getById(containedTypeId());
             NbtType secondType = NbtType.getById(v.typeId());
             throw WrongTypeExceptionBuilder.apply(firstType,secondType);

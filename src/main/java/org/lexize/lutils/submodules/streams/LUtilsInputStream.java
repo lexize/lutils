@@ -34,4 +34,7 @@ public class LUtilsInputStream <T extends InputStream> {
         _inputStream.close();
     }
 
+    public T getInputStream() {
+        return _inputStream;
+    }
 }

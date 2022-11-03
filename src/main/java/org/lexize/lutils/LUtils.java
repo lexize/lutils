@@ -5,6 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.text.OrderedText;
 import org.apache.commons.lang3.ArrayUtils;
+import org.lexize.ldocs.LDocs;
+import org.lexize.ldocs.annotations.LDocsDescription;
+import org.lexize.ldocs.annotations.LDocsInclude;
+import org.lexize.ldocs.annotations.LDocsProperty;
+import org.lexize.ldocs.models.LDocsClass;
 import org.lexize.lutils.submodules.hud.builders.FillRenderTaskBuilder;
 import org.lexize.lutils.submodules.hud.builders.TextRenderTaskBuilder;
 import org.lexize.lutils.submodules.hud.builders.TextureRenderTaskBuilder;
@@ -20,16 +25,19 @@ import org.luaj.vm2.LuaValue;
 import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.FiguraAPI;
 import org.moon.figura.lua.LuaWhitelist;
+import org.moon.figura.trust.FiguraTrust;
 import org.moon.figura.trust.Trust;
-import org.moon.figura.trust.TrustManager;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @LuaWhitelist
-public class LUtils implements FiguraAPI {
+@LDocsProperty(name = "example_code", stringValue = "/lutils/example_code/lutils.lua", fromResource = true)
+@LDocsDescription("Main class of LUtils")
+public class LUtils implements FiguraAPI, FiguraTrust {
     private Avatar _avatar;
     public static final String API_NAME = "lutils";
     private static final Gson _json = new GsonBuilder().setPrettyPrinting().create();
@@ -37,21 +45,52 @@ public class LUtils implements FiguraAPI {
     private ExperimentalSettings experimentalSettings;
 
     @LuaWhitelist
+    @LDocsInclude
+    @LDocsDescription("JSON submodule of LUtils")
     public LUtilsJson json = new LUtilsJson();
+
     @LuaWhitelist
+    @LDocsInclude
+    @LDocsDescription("File submodule of LUtils")
+    @LDocsProperty(name = "important", stringValue = "/lutils/important/nil_if_non_host.txt", fromResource = true)
     public LUtilsFile file;
+
     @LuaWhitelist
+    @LDocsInclude
+    @LDocsDescription("Regex submodule of LUtils")
     public LUtilsRegex regex;
+
     @LuaWhitelist
+    @LDocsInclude
+    @LDocsDescription("Misc submodule of LUtils")
     public LUtilsMisc misc = new LUtilsMisc();
+
     @LuaWhitelist
+    @LDocsInclude
+    @LDocsDescription("HUD submodule of LUtils")
+    @LDocsProperty(name = "important", stringValue = "/lutils/important/nil_if_non_host.txt", fromResource = true)
+    @LDocsProperty(name = "important", stringValue = "/lutils/important/experimental.txt", fromResource = true)
     public LUtilsHUD hud;
+
     @LuaWhitelist
+    @LDocsInclude
+    @LDocsDescription("HTTP submodule of LUtils")
+    @LDocsProperty(name = "important", stringValue = "/lutils/important/experimental.txt", fromResource = true)
     public LUtilsHttp http;
+
     @LuaWhitelist
+    @LDocsInclude
+    @LDocsDescription("NBT submodule of LUtils")
+    @LDocsProperty(name = "important", stringValue = "/lutils/important/experimental.txt", fromResource = true)
     public LUtilsNbt nbt;
 
-    public LUtilsTestClass test = new LUtilsTestClass();
+    public static void main(String[] args) throws IOException {
+        Map<String, LDocsClass> classTree = LDocs.getDocsTree(getLUtilsClasses().toArray(new Class[0]));
+        FileOutputStream fos = new FileOutputStream("docs.json");
+        fos.write(_json.toJson(classTree).getBytes());
+        fos.close();
+    }
+
     public LUtils() {
 
     }
@@ -63,8 +102,8 @@ public class LUtils implements FiguraAPI {
             file = new LUtilsFile();
             if (experimentalSettings.hud_submodule) hud = new LUtilsHUD(_avatar);
         }
-        if (experimentalSettings.http_submodule) http = new LUtilsHttp(_avatar);
-        if (experimentalSettings.nbt_submodule) nbt = new LUtilsNbt(_avatar);
+        if (experimentalSettings.http_submodule) http = new LUtilsHttp();
+        if (experimentalSettings.nbt_submodule) nbt = new LUtilsNbt();
         regex = new LUtilsRegex(_avatar);
     }
 
@@ -78,7 +117,6 @@ public class LUtils implements FiguraAPI {
           case "hud" -> hud;
           case "http" -> http;
           case "nbt" -> nbt;
-          case "test" -> test;
           default -> null;
         };
     }
@@ -99,8 +137,7 @@ public class LUtils implements FiguraAPI {
         return _json;
     }
 
-    @Override
-    public Collection<Class<?>> getWhitelistedClasses() {
+    private static Collection<Class<?>> getLUtilsClasses () {
         return List.of(
                 LUtils.class,
 
@@ -117,8 +154,6 @@ public class LUtils implements FiguraAPI {
                 LUtilsMisc.class,
 
                 LUtilsHttp.class,
-
-                LVarargs.class,
 
                 LUtilsNbt.class,
                 LUtilsNbtByte.class,
@@ -142,9 +177,19 @@ public class LUtils implements FiguraAPI {
     }
 
     @Override
-    public Collection<Trust> customTrust() {
+    public Collection<Class<?>> getWhitelistedClasses() {
+        return getLUtilsClasses();
+    }
+
+    @Override
+    public String getTitle() {
+        return "LUtils";
+    }
+
+    @Override
+    public Collection<Trust> getTrusts() {
         return List.of(
-                new Trust("http",0,0,1,1,1)
+                new Trust("http", 0,0,0,1,1)
         );
     }
 

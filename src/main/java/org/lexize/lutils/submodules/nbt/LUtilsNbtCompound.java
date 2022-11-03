@@ -1,10 +1,15 @@
 package org.lexize.lutils.submodules.nbt;
 
 import org.lexize.lutils.LUtils;
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +47,15 @@ public class LUtilsNbtCompound extends LUtilsNbtValue<Map<String, LUtilsNbtValue
     }
 
     @Override
+    public void writePureData(LUtilsOutputStream luos) throws IOException {
+        for (Map.Entry<String, LUtilsNbtValue> entry:
+                value.entrySet()) {
+            entry.getValue().writeBytes(entry.getKey(), luos);
+        }
+        luos.write(0);
+    }
+
+    @Override
     public byte typeId() {
         return 10;
     }
@@ -69,6 +83,31 @@ public class LUtilsNbtCompound extends LUtilsNbtValue<Map<String, LUtilsNbtValue
     }
 
     @Override
+    public NbtReturnValue getValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] nameLengthBytes = is.readNBytes(2);
+            int nameLength = ((nameLengthBytes[0]) << 8) + (nameLengthBytes[1]);
+            byte[] nameBytes = is.readNBytes(nameLength);
+
+            HashMap<String, LUtilsNbtValue> compoundMap = new HashMap<>();
+
+
+            int t;
+            NbtType type = null;
+            while ((t = is.read()) != 0) {
+                type = NbtType.getById(t);
+                NbtReturnValue v = type.typeGetFromStreamFunction.apply(stream);
+                compoundMap.put(v.name(), v.value());
+            }
+
+            return new NbtReturnValue<>(new String(nameBytes), new LUtilsNbtCompound(compoundMap), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public NbtReturnValue getPureValue(byte[] bytes, int offset) {
         int valueOffset = offset;
 
@@ -81,6 +120,24 @@ public class LUtilsNbtCompound extends LUtilsNbtValue<Map<String, LUtilsNbtValue
             valueOffset = v.newOffset();
         }
         return new NbtReturnValue<>(null, new LUtilsNbtCompound(compoundMap), valueOffset+1);
+    }
+
+    @Override
+    public NbtReturnValue getPureValue(LUtilsInputStream stream) {
+        try {
+            InputStream is = stream.getInputStream();
+            HashMap<String, LUtilsNbtValue> compoundMap = new HashMap<>();
+
+            NbtType type;
+            while ((type = NbtType.getById(is.read())) != null) {
+                NbtReturnValue v = type.typeGetFromStreamFunction.apply(stream);
+                compoundMap.put(v.name(), v.value());
+            }
+
+            return new NbtReturnValue<>(null, new LUtilsNbtCompound(compoundMap), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @LuaWhitelist

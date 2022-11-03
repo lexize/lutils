@@ -22,6 +22,10 @@ public class LUtilsLuaValue extends LuaValue {
         typeManager = manager;
     }
 
+    public LuaTypeManager getLuaTypeManager() {
+        return typeManager;
+    }
+
     private enum LuaType {
         STRING(l -> l.tojstring()),
         BOOLEAN(l -> l.toboolean()),
@@ -106,27 +110,27 @@ public class LUtilsLuaValue extends LuaValue {
         return super.get(key);
     }
 
-    protected static LuaTable fromArray(Object[] objs) {
+    protected static LuaTable fromArray(Object[] objs, LuaTypeManager typeManager) {
         LuaTable vals = new LuaTable();
         for (int i = 0; i < objs.length; i++) {
-            vals.set(i+1, fromJavaValue(objs[i]).arg1());
+            vals.set(i+1, fromJavaValue(objs[i], typeManager).arg1());
         }
         return vals;
     }
 
-    protected static LuaTable fromCollection(Collection<?> collection) {
+    protected static LuaTable fromCollection(Collection<?> collection, LuaTypeManager typeManager) {
         LuaTable vals = new LuaTable();
         for (Object o:
              collection) {
-            vals.add(fromJavaValue(o).arg1());
+            vals.add(fromJavaValue(o, typeManager).arg1());
         }
         return vals;
     }
-    protected static Varargs fromJavaValue(Object obj) {
+    protected static Varargs fromJavaValue(Object obj, LuaTypeManager typeManager) {
         if (obj == null) return LuaValue.NIL;
         else if (obj instanceof Varargs a) return a;
-        else if (obj.getClass().isArray()) return fromArray((Object[]) obj);
-        else if (obj instanceof Collection<?> objs) return fromCollection(objs);
+        else if (obj.getClass().isArray()) return fromArray((Object[]) obj, typeManager);
+        else if (obj instanceof Collection<?> objs) return fromCollection(objs, typeManager);
         else if (obj instanceof Double d) return LuaValue.valueOf(d);
         else if (obj instanceof String s) return LuaValue.valueOf(s);
         else if (obj instanceof Boolean b) return LuaValue.valueOf(b);
@@ -136,7 +140,7 @@ public class LUtilsLuaValue extends LuaValue {
         else if (obj instanceof Long l) return LuaValue.valueOf(l);
         else if (obj instanceof Character c) return LuaValue.valueOf(c);
         else if (obj instanceof Short s) return LuaValue.valueOf(s);
-        return new LuaUserdata(obj);
+        return typeManager.javaToLua(obj);
     }
 
     public static Object[] matchOverload(Method overload, Varargs args) throws LuaToJavaConversionError, MatchOverloadFailed {

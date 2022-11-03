@@ -20,10 +20,11 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Grabbing figura from test repo
-    modImplementation "org.moon:FiguraRewriteRewrite:${project.figura_version}"
-
+    //modImplementation "org.moon:FiguraRewriteRewrite:${project.figura_test_version}"
     // Non test implementation
-    // modImplementation "com.github.Kingdom-of-The-Moon:FiguraRewriteRewrite:${project.figura_version}"
+    modImplementation "com.github.Kingdom-of-The-Moon:FiguraRewriteRewrite:${project.figura_version}"
+
+    modImplementation "org.lexize:ldocs:1.0-SNAPSHOT"
 }
 
 processResources {

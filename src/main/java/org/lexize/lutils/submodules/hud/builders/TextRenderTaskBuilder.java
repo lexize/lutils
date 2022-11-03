@@ -7,13 +7,14 @@ import org.luaj.vm2.LuaError;
 import org.moon.figura.lua.LuaWhitelist;
 import org.moon.figura.math.vector.FiguraVec2;
 import org.moon.figura.math.vector.FiguraVec3;
+import org.moon.figura.math.vector.FiguraVec4;
 import org.moon.figura.utils.caching.CacheUtils;
 
 @LuaWhitelist
 public class TextRenderTaskBuilder extends HUDRenderTaskBuilder{
     public String text;
     public FiguraVec3 pos;
-    public FiguraVec3 color = FiguraVec3.of(1,1,1);
+    public FiguraVec4 color = FiguraVec4.of(1,1,1,1);
     public Boolean shadow = false;
     public Boolean mirror = false;
     public Float size = 1f;
@@ -35,7 +36,7 @@ public class TextRenderTaskBuilder extends HUDRenderTaskBuilder{
     }
 
     @LuaWhitelist
-    public TextRenderTaskBuilder color(FiguraVec3 color) {
+    public TextRenderTaskBuilder color(FiguraVec4 color) {
         this.color = color;
         return this;
     }
@@ -69,7 +70,7 @@ public class TextRenderTaskBuilder extends HUDRenderTaskBuilder{
     }
 
     @LuaWhitelist
-    public FiguraVec3 getColor() {
+    public FiguraVec4 getColor() {
         return color;
     }
 
@@ -92,7 +93,7 @@ public class TextRenderTaskBuilder extends HUDRenderTaskBuilder{
     @Override
     public void replaceNullWithDefaults() {
         if (pos == null) pos = FiguraVec3.of();
-        if (color == null) color = FiguraVec3.of(1,1,1);
+        if (color == null) color = FiguraVec4.of(1,1,1,1);
         if (size == null) size = 1f;
         if (shadow == null) shadow = false;
         if (mirror == null) mirror = false;

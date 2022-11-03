@@ -1,7 +1,11 @@
 package org.lexize.lutils.submodules;
 
+import org.lexize.ldocs.annotations.LDocsDescription;
+import org.lexize.ldocs.annotations.LDocsInclude;
+import org.lexize.ldocs.annotations.LDocsProperty;
 import org.lexize.lutils.LUtils;
 import org.lexize.lutils.LVarargs;
+import org.lexize.lutils.submodules.nbt.LUtilsNbtValue;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -20,16 +24,22 @@ import java.util.List;
 import java.util.Map;
 
 @LuaWhitelist
+@LDocsDescription("HTTP submodule of LUtils")
+@LDocsProperty(name = "important", stringValue = "/lutils/important/experimental.txt", fromResource = true)
 public class LUtilsHttp {
-    private final Avatar _parentAvatar;
     private HttpClient _client = HttpClient.newBuilder().build();
 
-    public LUtilsHttp(Avatar avatar) {
-        _parentAvatar = avatar;
-    }
-
     @LuaWhitelist
-    public LVarargs get(@LuaNotNil String uri, LuaTable headers) throws IOException, InterruptedException {
+    @LDocsInclude
+    @LDocsDescription("Requests data from given URI via GET method")
+    @LDocsProperty(name = "use_varargs", boolValue = true)
+    @LDocsProperty(name = "varargs", classValue = {LuaTable.class, Integer.class, LuaTable.class})
+    @LDocsProperty(name = "varargs_descs", stringValue = {
+            "Byte table of response data",
+            "Status code of response",
+            "Headers of response"
+    })
+    public Object[] get(@LuaNotNil String uri, LuaTable headers) throws IOException, InterruptedException {
         if (headers == null) headers = new LuaTable();
 
         HttpRequest.Builder requestBuilder = requestBuilderByUriAndHeaders(uri, headers);
@@ -41,7 +51,16 @@ public class LUtilsHttp {
     }
 
     @LuaWhitelist
-    public LVarargs delete(@LuaNotNil String uri, LuaTable headers) throws IOException, InterruptedException {
+    @LDocsInclude
+    @LDocsDescription("Requests data from given URI via DELETE method")
+    @LDocsProperty(name = "use_varargs", boolValue = true)
+    @LDocsProperty(name = "varargs", classValue = {LuaTable.class, Integer.class, LuaTable.class})
+    @LDocsProperty(name = "varargs_descs", stringValue = {
+            "Byte table of response data",
+            "Status code of response",
+            "Headers of response"
+    })
+    public Object[] delete(@LuaNotNil String uri, LuaTable headers) throws IOException, InterruptedException {
         if (headers == null) headers = new LuaTable();
 
         HttpRequest.Builder requestBuilder = requestBuilderByUriAndHeaders(uri, headers);
@@ -53,7 +72,16 @@ public class LUtilsHttp {
     }
 
     @LuaWhitelist
-    public LVarargs post(@LuaNotNil String uri, @LuaNotNil LuaValue data, LuaTable headers) throws IOException, InterruptedException {
+    @LDocsInclude
+    @LDocsDescription("Requests data from given URI via POST method")
+    @LDocsProperty(name = "use_varargs", boolValue = true)
+    @LDocsProperty(name = "varargs", classValue = {LuaTable.class, Integer.class, LuaTable.class})
+    @LDocsProperty(name = "varargs_descs", stringValue = {
+            "Byte table of response data",
+            "Status code of response",
+            "Headers of response"
+    })
+    public Object[] post(@LuaNotNil String uri, @LuaNotNil LuaValue data, LuaTable headers) throws IOException, InterruptedException {
         if (headers == null) headers = new LuaTable();
         byte[] bytes = luaValueToBytes(data);
 
@@ -67,7 +95,16 @@ public class LUtilsHttp {
     }
 
     @LuaWhitelist
-    public LVarargs put(@LuaNotNil String uri, @LuaNotNil LuaValue data, LuaTable headers) throws IOException, InterruptedException {
+    @LDocsInclude
+    @LDocsDescription("Requests data from given URI via PUT method")
+    @LDocsProperty(name = "use_varargs", boolValue = true)
+    @LDocsProperty(name = "varargs", classValue = {LuaTable.class, Integer.class, LuaTable.class})
+    @LDocsProperty(name = "varargs_descs", stringValue = {
+            "Byte table of response data",
+            "Status code of response",
+            "Headers of response"
+    })
+    public Object[] put(@LuaNotNil String uri, @LuaNotNil LuaValue data, LuaTable headers) throws IOException, InterruptedException {
         if (headers == null) headers = new LuaTable();
         byte[] bytes = luaValueToBytes(data);
 
@@ -80,7 +117,16 @@ public class LUtilsHttp {
     }
 
     @LuaWhitelist
-    public LVarargs method(@LuaNotNil String uri, @LuaNotNil String methodName, @LuaNotNil LuaValue data, LuaTable headers) throws IOException, InterruptedException {
+    @LDocsInclude
+    @LDocsDescription("Requests data from given URI via specified method")
+    @LDocsProperty(name = "use_varargs", boolValue = true)
+    @LDocsProperty(name = "varargs", classValue = {LuaTable.class, Integer.class, LuaTable.class})
+    @LDocsProperty(name = "varargs_descs", stringValue = {
+            "Byte table of response data",
+            "Status code of response",
+            "Headers of response"
+    })
+    public Object[] method(@LuaNotNil String uri, @LuaNotNil String methodName, @LuaNotNil LuaValue data, LuaTable headers) throws IOException, InterruptedException {
         if (headers == null) headers = new LuaTable();
         byte[] bytes = luaValueToBytes(data);
 
@@ -101,7 +147,7 @@ public class LUtilsHttp {
         return requestBuilder;
     }
 
-    private LVarargs lVarargsByResponse(HttpResponse<byte[]> response) {
+    private Object[] lVarargsByResponse(HttpResponse<byte[]> response) {
         LuaTable headers = new LuaTable();
 
         for (Map.Entry<String, List<String>> header:
@@ -114,21 +160,16 @@ public class LUtilsHttp {
             headers.set(header.getKey(), headerValues);
         }
 
-        return new LVarargs(
-                LUtils.Utils.byteArrayToTable(response.body()),
-                LuaValue.valueOf(response.statusCode()),
-                headers
-        );
+        return new Object[] {
+                LUtils.Utils.byteArrayToTable(response.body()), response.statusCode(), headers
+        };
     }
 
     private byte[] luaValueToBytes(LuaValue data) {
-        switch (data.type()) {
-            case (LuaValue.TTABLE):
-                return LUtils.Utils.tableToByteArray(data.checktable());
-            case (LuaValue.TSTRING):
-                return data.checkjstring().getBytes(StandardCharsets.UTF_8);
-            default:
-                throw new LuaError("Data should be either string or byte array.");
-        }
+        return switch (data.type()) {
+            case (LuaValue.TTABLE) -> LUtils.Utils.tableToByteArray(data.checktable());
+            case (LuaValue.TSTRING) -> data.checkjstring().getBytes(StandardCharsets.UTF_8);
+            default -> throw new LuaError("Data should be either string or byte array.");
+        };
     }
 }

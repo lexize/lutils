@@ -71,7 +71,7 @@ public class LUtilsJson{
                     LuaValue.TLIGHTUSERDATA,
                     LuaValue.TUSERDATA
                     -> toJsonElementFromLuaTable(value.checktable());
-            default -> throw new LuaError("Unexpected type: " + valueType);
+            default -> null;
         };
     }
 
@@ -97,7 +97,10 @@ public class LUtilsJson{
             String k;
             if (key.type() == LuaValue.TSTRING) k = key.tojstring();
             else k = Double.toString(key.todouble());
-            object.add(k, toJsonElement(v));
+            JsonElement element = toJsonElement(v);
+            if (element != null) {
+                object.add(k, element);
+            }
         }
         return object;
     }

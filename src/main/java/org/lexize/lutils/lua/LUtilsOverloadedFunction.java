@@ -27,7 +27,7 @@ public class LUtilsOverloadedFunction extends VarArgFunction {
                 methods) {
             try {
                 Object[] overloadArgs = LUtilsLuaValue.matchOverload(m, fArgs);
-                return LUtilsLuaValue.fromJavaValue(m.invoke(parent, overloadArgs));
+                return LUtilsLuaValue.fromJavaValue(m.invoke(parent, overloadArgs), parent.getLuaTypeManager());
             }
             catch (LuaToJavaConversionError | MatchOverloadFailed e) {
                 e.printStackTrace();

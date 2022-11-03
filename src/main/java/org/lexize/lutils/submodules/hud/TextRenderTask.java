@@ -10,6 +10,7 @@ import net.minecraft.util.math.Matrix4f;
 import org.lexize.lutils.submodules.LUtilsHUD;
 import org.moon.figura.math.vector.FiguraVec2;
 import org.moon.figura.math.vector.FiguraVec3;
+import org.moon.figura.math.vector.FiguraVec4;
 import org.moon.figura.utils.caching.CacheUtils;
 
 public class TextRenderTask extends HUDRenderTask {
@@ -28,17 +29,18 @@ public class TextRenderTask extends HUDRenderTask {
         textRenderer = MinecraftClient.getInstance().textRenderer;
     }
 
-    public void construct(String text, FiguraVec3 pos, FiguraVec3 color,
+    public void construct(String text, FiguraVec3 pos, FiguraVec4 color,
                           Boolean shadow, Boolean mirror, Float size) {
         this.text = text;
         x = (float) pos.x;
         y = (float) pos.y;
         z = (float) pos.z;
-        int r, g, b;
+        int r,g,b,a;
         r = (int)(color.x*255f);
         g = (int)(color.y*255f);
         b = (int)(color.z*255f);
-        this.color = (b & 0xFF) + ((g & 0xFF) << 8) + ((r & 0xFF) << 16);
+        a = (int)(color.w*255f);
+        this.color = (b & 0xFF) + ((g & 0xFF) << 8) + ((r & 0xFF) << 16) + ((a & 0xFF) << 24);
         this.shadow = shadow;
         this.mirror = mirror;
         this.size = size;
@@ -57,7 +59,6 @@ public class TextRenderTask extends HUDRenderTask {
             textRenderer.draw(textLines[i], 0, (textRenderer.fontHeight * i), color, shadow, matrix, immediate, false, 0, 15728880, mirror);
         }
         immediate.draw();
-
         matrixStack.pop();
     }
 

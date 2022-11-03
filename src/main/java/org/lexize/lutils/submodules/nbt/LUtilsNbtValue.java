@@ -1,11 +1,18 @@
 package org.lexize.lutils.submodules.nbt;
 
 import org.lexize.lutils.LUtils;
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
+import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public abstract class LUtilsNbtValue <T> {
 
@@ -31,6 +38,9 @@ public abstract class LUtilsNbtValue <T> {
         public final BiFunction<byte[], Integer, NbtReturnValue> typeGetFunction;
         public final BiFunction<byte[], Integer, NbtReturnValue> typeGetPureFunction;
 
+        public final Function<LUtilsInputStream, NbtReturnValue> typeGetFromStreamFunction;
+        public final Function<LUtilsInputStream, NbtReturnValue> typeGetPureFromStreamFunction;
+
         NbtType(Class<? extends LUtilsNbtValue> typeClass){
             try {
                 this.typeClass = typeClass;
@@ -38,13 +48,15 @@ public abstract class LUtilsNbtValue <T> {
                 LUtilsNbtValue v = typeClass.getConstructor().newInstance();
                 typeGetFunction = v::getValue;
                 typeGetPureFunction = v::getPureValue;
+                typeGetFromStreamFunction = v::getValue;
+                typeGetPureFromStreamFunction = v::getPureValue;
                 this.typeName = v.typeName();
                 this.typeId = v.typeId();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        public static NbtType getById(byte id) {
+        public static NbtType getById(int id) {
             for (NbtType type:
                  NbtType.values()) {
                 if (type.typeId == id) return type;
@@ -66,9 +78,26 @@ public abstract class LUtilsNbtValue <T> {
     public byte[] getBytes(String name) {
         return getBytesByValue(name, getPureData());
     }
+    public void writeBytes(String name, LUtilsOutputStream luos) {
+        try {
+            OutputStream os = luos.getOutputStream();
+            byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
+            if (nameBytes.length > 0xFFFF) throw new RuntimeException("Name length (%s) more than %s".formatted(nameBytes.length, 0xffff));
+            byte[] header = new byte[] {
+                    typeId(), (byte) ((nameBytes.length >> 8) & 0xFF), (byte) ((nameBytes.length) & 0xFF)
+            };
+            os.write(header);
+            os.write(nameBytes);
+            writePureData(luos);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new LuaError("Write exception");
+        }
+    }
 
     public abstract byte[] getPureData();
-
+    public abstract void writePureData(LUtilsOutputStream luos) throws IOException;
     protected byte[] getBytesByValue(String name, byte[] valueBytes) {
         byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
         if (nameBytes.length > 0xFFFF) throw new RuntimeException("Name length (%s) more than %s".formatted(nameBytes.length, 0xffff));
@@ -84,10 +113,23 @@ public abstract class LUtilsNbtValue <T> {
 
     public abstract NbtReturnValue getValue(byte[] bytes, int offset);
     public abstract NbtReturnValue getPureValue(byte[] bytes, int offset);
+    public abstract NbtReturnValue getValue(LUtilsInputStream stream);
+    public abstract NbtReturnValue getPureValue(LUtilsInputStream stream);
+
+    public static NbtReturnValue readFromStream(LUtilsInputStream luis) throws IOException {
+        NbtType type = NbtType.getById(luis.read());
+        return type.typeGetFromStreamFunction.apply(luis);
+    }
+
+    public static NbtReturnValue readFromBytes(LuaTable bytes, int offset) {
+        byte[] bt = LUtils.Utils.tableToByteArray(bytes);
+        NbtType type = NbtType.getById(bt[offset]);
+        return type.typeGetFunction.apply(bt, offset);
+    }
 
     @Override
     public String toString() {
-        return "%s(''): %s".formatted(typeName(), value);
+        return toString("");
     }
 
     public String toString(String name) {

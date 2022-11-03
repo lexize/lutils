@@ -1,8 +1,13 @@
 package org.lexize.lutils.submodules.nbt;
 
+import org.lexize.lutils.submodules.streams.LUtilsInputStream;
+import org.lexize.lutils.submodules.streams.LUtilsOutputStream;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 @LuaWhitelist
@@ -19,6 +24,11 @@ public class LUtilsNbtByte extends LUtilsNbtValue<Byte> implements LUtilsNbtValu
         return new byte[] {
                 value
         };
+    }
+
+    @Override
+    public void writePureData(LUtilsOutputStream luos) throws IOException {
+        luos.getOutputStream().write(value);
     }
 
     @Override
@@ -40,8 +50,31 @@ public class LUtilsNbtByte extends LUtilsNbtValue<Byte> implements LUtilsNbtValu
     }
 
     @Override
+    public NbtReturnValue getValue(LUtilsInputStream stream){
+        try {
+            InputStream is = stream.getInputStream();
+            byte[] nameLengthBytes = is.readNBytes(2);
+            int nameLength = (nameLengthBytes[0] << 8) + (nameLengthBytes[1]);
+            byte[] nameBytes = is.readNBytes(nameLength);
+            byte val = (byte)(is.read());
+            return new NbtReturnValue<>(new String(nameBytes), new LUtilsNbtByte(val), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public NbtReturnValue getPureValue(byte[] bytes, int offset) {
-        return new NbtReturnValue("", new LUtilsNbtByte(bytes[offset]), offset+1);
+        return new NbtReturnValue(null, new LUtilsNbtByte(bytes[offset]), offset+1);
+    }
+
+    @Override
+    public NbtReturnValue getPureValue(LUtilsInputStream stream){
+        try {
+            return new NbtReturnValue<>(null, new LUtilsNbtByte((byte) stream.read()), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
