@@ -1,0 +1,12 @@
+{
+  "version": "${mod_version}",
+  "id": "lutils",
+  "schemaVersion": 1,
+  "name": "LUtils",
+
+  "entrypoints": {
+    "figura_api": [
+      "org.lexize.lutils.LUtils"
+    ]
+  }
+}

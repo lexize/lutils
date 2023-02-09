@@ -1,0 +1,48 @@
+plugins {
+    id 'maven-publish'
+    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id "io.github.juuxel.loom-quiltflower" version "1.+"
+}
+
+group 'org.lexize'
+String mc_ver = project.minecraft_version
+String mappings_ver = project.mappings;
+version = "${project.mod_version}+${mc_ver}"
+
+String fabric_api_version = project.fabric_api_version;
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.terraformersmc.com/releases/' }
+    maven { url 'https://api.modrinth.com/maven' }
+    maven { url 'https://maven.quiltmc.org/repository/release/' }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:$mc_ver"
+    mappings loom.layered {
+        mappings("org.quiltmc:quilt-mappings:$mc_ver+build.$mappings_ver:intermediary-v2")
+        officialMojangMappings()
+    }
+    modImplementation "net.fabricmc:fabric-loader:$loader_version"
+
+    modImplementation "com.github.Kingdom-of-The-Moon:FiguraRewriteRewrite:${figura_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
+}
+
+processResources {
+    Map<String, Object> properties = new HashMap<>()
+
+    properties.put("java_version", java_version)
+    properties.put("mod_version", mod_version);
+    properties.put("fabric_api_version", fabric_api_version);
+
+    properties.forEach((k, v) -> inputs.property(k, v.toString()))
+    filesMatching("fabric.mod.json") {
+        expand properties
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
