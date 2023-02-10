@@ -1,11 +1,14 @@
 package org.lexize.lutils.submodules.http;
 
 import org.lexize.lutils.LUtilsTrust;
+import org.lexize.lutils.annotations.LDescription;
+import org.lexize.lutils.annotations.LDocsFuncOverload;
 import org.lexize.lutils.misc.LFuture;
 import org.lexize.lutils.providers.LProvider;
 import org.lexize.lutils.readers.LReader;
 import org.lexize.lutils.streams.LJavaInputStream;
 import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaTable;
 import org.moon.figura.FiguraMod;
 import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.LuaWhitelist;
@@ -50,6 +53,12 @@ public class LHttp {
     }
 
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends HTTP GET request by specified URI, and returns response data with reader",
+            argumentNames = {"uri", "reader", "headers"},
+            argumentTypes = {String.class, LReader.class, LuaTable.class},
+            returnType = LHttpResponse.class
+    )
     public <R> LHttpResponse<R> get(String uri, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
@@ -60,6 +69,12 @@ public class LHttp {
         return new LHttpResponse<>(readData, d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends HTTP GET request by specified URI, and returns response with data stream",
+            argumentNames = {"uri", "headers"},
+            argumentTypes = {String.class, LuaTable.class},
+            returnType = LHttpResponse.class
+    )
     public LHttpResponse<LJavaInputStream> getStream(String uri, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
@@ -68,6 +83,12 @@ public class LHttp {
         return new LHttpResponse<>(new LJavaInputStream(stream), d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends async HTTP GET request by specified URI, and returns response data with reader",
+            argumentNames = {"uri", "reader", "headers"},
+            argumentTypes = {String.class, LReader.class, LuaTable.class},
+            returnType = LFuture.class
+    )
     public <R> LFuture<LHttpResponse<R>> getAsync(String uri, LReader<R> reader, HashMap<String, String> headers) {
         permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
@@ -88,6 +109,12 @@ public class LHttp {
         return future;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends async HTTP GET request by specified URI, and returns response with data stream",
+            argumentNames = {"uri", "headers"},
+            argumentTypes = {String.class, LuaTable.class},
+            returnType = LFuture.class
+    )
     public LFuture<LHttpResponse<LJavaInputStream>> getStreamAsync(String uri, HashMap<String, String> headers) {
         permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
@@ -109,6 +136,12 @@ public class LHttp {
         return builder;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends HTTP POST request by specified URI, and returns response data with reader",
+            argumentNames = {"uri", "data", "provider", "reader", "headers"},
+            argumentTypes = {String.class, Object.class, LProvider.class, LReader.class, LuaTable.class},
+            returnType = LHttpResponse.class
+    )
     public <P,R> LHttpResponse<R> post(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
@@ -119,6 +152,12 @@ public class LHttp {
         return new LHttpResponse<>(readData, d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends HTTP POST request by specified URI, and returns response with data stream",
+            argumentNames = {"uri", "data", "provider", "headers"},
+            argumentTypes = {String.class, Object.class, LProvider.class, LuaTable.class},
+            returnType = LHttpResponse.class
+    )
     public <P> LHttpResponse<LJavaInputStream> postStream(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
@@ -127,6 +166,12 @@ public class LHttp {
         return new LHttpResponse<>(new LJavaInputStream(stream), d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends async HTTP POST request by specified URI, and returns response data with reader",
+            argumentNames = {"uri", "data", "provider", "reader", "headers"},
+            argumentTypes = {String.class, Object.class, LProvider.class, LReader.class, LuaTable.class},
+            returnType = LFuture.class
+    )
     public <P,R> LFuture<LHttpResponse<R>> postAsync(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) {
         permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
@@ -147,6 +192,12 @@ public class LHttp {
         return future;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Sends async HTTP POST request by specified URI, and returns response with data stream",
+            argumentNames = {"uri", "data", "provider", "headers"},
+            argumentTypes = {String.class, Object.class, LProvider.class, LuaTable.class},
+            returnType = LFuture.class
+    )
     public <P,R> LFuture<LHttpResponse<LJavaInputStream>> postStreamAsync(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) {
         permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
@@ -168,6 +219,12 @@ public class LHttp {
         return builder;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, Object.class, LProvider.class, LReader.class, LuaTable.class},
+            argumentNames = {"uri", "data", "provider", "reader", "headers"},
+            description = "Sends HTTP PUT request by specified URI, and returns response data with reader",
+            returnType = LHttpResponse.class
+    )
     public <P,R> LHttpResponse<R> put(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
@@ -178,6 +235,12 @@ public class LHttp {
         return new LHttpResponse<>(readData, d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, Object.class, LProvider.class, LuaTable.class},
+            argumentNames = {"uri", "data", "provider", "headers"},
+            description = "Sends HTTP PUT request by specified URI, and returns response with data stream",
+            returnType = LHttpResponse.class
+    )
     public <P> LHttpResponse<LJavaInputStream> putStream(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
@@ -186,6 +249,12 @@ public class LHttp {
         return new LHttpResponse<>(new LJavaInputStream(stream), d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, Object.class, LProvider.class, LReader.class, LuaTable.class},
+            argumentNames = {"uri", "data", "provider", "reader", "headers"},
+            description = "Sends async HTTP PUT request by specified URI, and returns response data with reader",
+            returnType = LFuture.class
+    )
     public <P,R> LFuture<LHttpResponse<R>> putAsync(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) {
         permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
@@ -206,7 +275,13 @@ public class LHttp {
         return future;
     }
     @LuaWhitelist
-    public <P,R> LFuture<LHttpResponse<LJavaInputStream>> putStreamAsync(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) {
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, Object.class, LProvider.class, LuaTable.class},
+            argumentNames = {"uri", "data", "provider", "headers"},
+            description = "Sends async HTTP PUT request by specified URI, and returns response with data stream",
+            returnType = LFuture.class
+    )
+    public <P> LFuture<LHttpResponse<LJavaInputStream>> putStreamAsync(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) {
         permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
@@ -221,6 +296,12 @@ public class LHttp {
     }
 
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, LReader.class, LuaTable.class},
+            argumentNames = {"uri", "reader", "headers"},
+            description = "Sends HTTP DELETE request by specified URI, and returns response data with reader",
+            returnType = LHttpResponse.class
+    )
     public <R> LHttpResponse<R> delete(String uri, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
@@ -231,6 +312,12 @@ public class LHttp {
         return new LHttpResponse<>(readData, d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, LuaTable.class},
+            argumentNames = {"uri", "headers"},
+            description = "Sends HTTP DELETE request by specified URI, and returns response with data stream",
+            returnType = LHttpResponse.class
+    )
     public LHttpResponse<LJavaInputStream> deleteStream(String uri, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
@@ -239,6 +326,12 @@ public class LHttp {
         return new LHttpResponse<>(new LJavaInputStream(stream), d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, LReader.class, LuaTable.class},
+            argumentNames = {"uri", "reader", "headers"},
+            description = "Sends async HTTP DELETE request by specified URI, and returns response data with reader",
+            returnType = LFuture.class
+    )
     public <R> LFuture<LHttpResponse<R>> deleteAsync(String uri, LReader<R> reader, HashMap<String, String> headers) {
         permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
@@ -259,6 +352,12 @@ public class LHttp {
         return future;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, LuaTable.class},
+            argumentNames = {"uri", "headers"},
+            description = "Sends async HTTP DELETE request by specified URI, and returns response with data stream",
+            returnType = LFuture.class
+    )
     public LFuture<LHttpResponse<LJavaInputStream>> deleteStreamAsync(String uri, HashMap<String, String> headers) {
         permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
@@ -280,6 +379,12 @@ public class LHttp {
         return builder;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, String.class, Object.class, LProvider.class, LReader.class, LuaTable.class},
+            argumentNames = {"uri", "method", "data", "provider", "reader", "headers"},
+            description = "Sends HTTP request by specified URI with specified method, and returns response data with reader",
+            returnType = LHttpResponse.class
+    )
     public <P,R> LHttpResponse<R> method(String uri, String method, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
@@ -290,6 +395,12 @@ public class LHttp {
         return new LHttpResponse<>(readData, d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, String.class, Object.class, LProvider.class, LuaTable.class},
+            argumentNames = {"uri", "method", "data", "provider","headers"},
+            description = "Sends HTTP request by specified URI with specified method, and returns stream with response data",
+            returnType = LHttpResponse.class
+    )
     public <P> LHttpResponse<LJavaInputStream> methodStream(String uri, String method, P data, LProvider<P> provider, HashMap<String, String> headers) throws IOException, InterruptedException {
         permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
@@ -298,6 +409,12 @@ public class LHttp {
         return new LHttpResponse<>(new LJavaInputStream(stream), d.statusCode(), d.headers().map());
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, String.class, Object.class, LProvider.class, LReader.class, LuaTable.class},
+            argumentNames = {"uri", "method", "data", "provider", "reader", "headers"},
+            description = "Sends async HTTP request by specified URI with specified method, and returns response data with reader",
+            returnType = LFuture.class
+    )
     public <P,R> LFuture<LHttpResponse<R>> methodAsync(String uri, String method, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) {
         permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
@@ -318,7 +435,13 @@ public class LHttp {
         return future;
     }
     @LuaWhitelist
-    public <P,R> LFuture<LHttpResponse<LJavaInputStream>> methodStreamAsync(String uri, String method, P data, LProvider<P> provider, HashMap<String, String> headers) {
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, String.class, Object.class, LProvider.class, LuaTable.class},
+            argumentNames = {"uri", "method", "data", "provider","headers"},
+            description = "Sends async HTTP request by specified URI with specified method, and returns stream with response data",
+            returnType = LFuture.class
+    )
+    public <P> LFuture<LHttpResponse<LJavaInputStream>> methodStreamAsync(String uri, String method, P data, LProvider<P> provider, HashMap<String, String> headers) {
         permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());

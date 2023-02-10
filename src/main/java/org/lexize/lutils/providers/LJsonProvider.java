@@ -1,5 +1,7 @@
 package org.lexize.lutils.providers;
 
+import org.lexize.lutils.annotations.LDocsFuncOverload;
+import org.lexize.lutils.annotations.LInclude;
 import org.lexize.lutils.streams.LInputStream;
 import org.lexize.lutils.streams.LJavaInputStream;
 import org.lexize.lutils.submodules.json.LJsonSerializer;
@@ -13,7 +15,13 @@ public class LJsonProvider extends LProvider<Object> {
     public LJsonProvider(LJsonSerializer serializer) {
         this.serializer = serializer;
     }
-    @Override
+    @LInclude
+    @LDocsFuncOverload(
+            argumentTypes = Object.class,
+            argumentNames = "source",
+            description = "Returns stream with bytes of provided object converted to JSON",
+            returnType = LInputStream.class
+    )
     public LInputStream getStream(Object source) {
         String json = serializer.serialize(source);
         ByteArrayInputStream bais = new ByteArrayInputStream(json.getBytes());

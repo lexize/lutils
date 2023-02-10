@@ -1,5 +1,7 @@
 package org.lexize.lutils.submodules;
 
+import org.lexize.lutils.annotations.LDescription;
+import org.lexize.lutils.annotations.LDocsFuncOverload;
 import org.lexize.lutils.providers.LProvider;
 import org.lexize.lutils.readers.LReader;
 import org.lexize.lutils.streams.LInputStream;
@@ -14,64 +16,74 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
 @LuaWhitelist
 public class LFile {
     private String folderName;
     @LuaWhitelist
+    @LDescription("Sets data folder name")
     public void setFolderName(String folderName) {
-        this.folderName = folderName;
+        if (folderName.matches("^[a-zA-Z_\\-0-9]+$")) this.folderName = folderName;
+        else throw new LuaError("Folder name can contain only these symbols:\na-z, A-Z, 0-9, _, -");
     }
     @LuaWhitelist
+    @LDescription("Returns data folder name")
     public String getFolderName() {
         return folderName;
     }
     private Path getFolderPath() {
         return FiguraMod.getFiguraDirectory().resolve("data/%s".formatted(folderName)).toAbsolutePath().normalize();
     }
-    private void doChecks(Path path) {
+    private void doPreparations(Path path) {
         if (folderName == null) throw new LuaError("Folder name isn't set");
         if (path != null) {
-            var p = path.normalize().toAbsolutePath().normalize();
-            if (!p.startsWith(p)) throw new LuaError("Path %s is not in %s".formatted(p.relativize(path), path));
+            Path folderPath = getFolderPath();
+            var p = path.toAbsolutePath().normalize();
+            if (!p.startsWith(folderPath)) throw new LuaError("Path %s is not in %s".formatted(p, folderPath));
         }
+        getFolderPath().toFile().mkdirs();
     }
 
     @LuaWhitelist
+    @LDescription("Opens input stream for file by specified path")
     public LInputStream openInputStream(String path) throws FileNotFoundException {
         Path filePath = getFolderPath().resolve(path);
-        doChecks(filePath);
+        doPreparations(filePath);
         FileInputStream fis = new FileInputStream(filePath.toFile());
         return new LJavaInputStream(fis);
     }
 
     @LuaWhitelist
+    @LDescription("Opens output stream for file by specified path")
     public LOutputStream openOutputStream(String path) throws FileNotFoundException {
         Path filePath = getFolderPath().resolve(path);
-        doChecks(filePath);
+        doPreparations(filePath);
         FileOutputStream fos = new FileOutputStream(filePath.toFile());
         return new LJavaOutputStream(fos);
     }
 
     @LuaWhitelist
-    public Object read(String path, LReader<?> reader) throws IOException {
+    @LDescription("Reads file with specified reader")
+    public <T> T read(String path, LReader<T> reader) throws IOException {
         Path filePath = getFolderPath().resolve(path);
-        doChecks(filePath);
-        var r = reader != null ? reader : LReaders.STRING_READER;
+        doPreparations(filePath);
         FileInputStream fis = new FileInputStream(filePath.toFile());
-        Object val = r.readFrom(fis);
+        T val = reader.readFrom(fis);
         fis.close();
         return val;
     }
 
     @LuaWhitelist
-    public void write(String path, Object data, LProvider<?> provider) throws IOException {
+    @LDocsFuncOverload(
+            argumentTypes = {String.class, Object.class, LProvider.class},
+            argumentNames = {"path","data","provider"},
+            description = "Writes data in file by specified path with specified provider"
+    )
+    public <T> void write(String path, T data, LProvider<T> provider) throws IOException {
         Path filePath = getFolderPath().resolve(path);
-        doChecks(filePath);
-        LProvider<?> p = provider != null ? provider : LProviders.STRING_PROVIDER;
-        LInputStream lis = p.getStream(data);
+        doPreparations(filePath);
+        LInputStream lis = provider.getStream(data);
         FileOutputStream fos = new FileOutputStream(filePath.toFile());
         lis.transferTo(fos);
         lis.close();

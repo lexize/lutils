@@ -1,5 +1,7 @@
 package org.lexize.lutils.submodules.http;
 
+import org.lexize.lutils.annotations.LDocsFuncOverload;
+import org.luaj.vm2.LuaTable;
 import org.moon.figura.lua.LuaWhitelist;
 
 import java.util.List;
@@ -16,15 +18,27 @@ public class LHttpResponse<T> {
         this.headers = headers;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Returns response code",
+            returnType = int.class
+    )
     public int getCode() {
         return code;
     }
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Returns response data",
+            returnType = Object.class
+    )
     public T getData() {
         return data;
     }
 
     @LuaWhitelist
+    @LDocsFuncOverload(
+            description = "Returns response headers",
+            returnType = LuaTable.class
+    )
     public Map<String, List<String>> getHeaders() {
         return headers;
     }

@@ -9,7 +9,9 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @LuaWhitelist
@@ -17,8 +19,6 @@ public class LJsonSerializer {
     private final Gson serializer;
     public LJsonSerializer(HashMap<String, ?> settings) {
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(LJsonObject.class, new LJsonObjectConverter());
-        builder.registerTypeAdapter(LJsonArray.class, new LJsonArrayConverter());
         for (Map.Entry<String, ?> kv :
                 settings.entrySet()) {
             Object v = kv.getValue();
@@ -48,12 +48,7 @@ public class LJsonSerializer {
     @LuaWhitelist
     public Object deserialize(String json) {
         JsonElement element = JsonParser.parseString(json);
-        if (element.isJsonNull()) return null;
-        if (element.isJsonPrimitive()) {
-            return fromJsonPrimitive(element.getAsJsonPrimitive());
-        }
-        Class<? extends LJsonValue<?>> c = element.isJsonObject() ? LJsonObject.class : LJsonArray.class;
-        return serializer.fromJson(element, c);
+        return fromjsonElement(element);
     }
 
     @LuaWhitelist
@@ -64,7 +59,26 @@ public class LJsonSerializer {
     public LJsonReader newReader() {
         return new LJsonReader(this);
     }
-
+    public static Object fromjsonElement(JsonElement element) {
+        if (element.isJsonNull()) return null;
+        else if (element.isJsonPrimitive()) return fromJsonPrimitive(element.getAsJsonPrimitive());
+        else if (element.isJsonArray()) {
+            List<Object> l = new ArrayList<>();
+            JsonArray jarr = element.getAsJsonArray();
+            for (JsonElement elem :
+                    jarr) {
+                l.add(fromjsonElement(elem));
+            }
+            return l;
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        JsonObject jobj = element.getAsJsonObject();
+        for (Map.Entry<String, JsonElement> kv:
+                jobj.entrySet()){
+            map.put(kv.getKey(), fromjsonElement(kv.getValue()));
+        }
+        return map;
+    }
     public static Object fromJsonPrimitive(JsonPrimitive primitive) {
         if(primitive.isString()) {
             return primitive.getAsString();
@@ -104,19 +118,19 @@ public class LJsonSerializer {
             break;
         }
         if (isArray) {
-            LJsonArray arr = new LJsonArray();
+            List<Object> l = new ArrayList<>(tbl.length());
             for (int i = 1; i <= tbl.length(); i++) {
-                arr.add(fromLuaValue(tbl.get(i)));
+                l.add(fromLuaValue(tbl.get(i)));
             }
-            return arr;
+            return l;
         }
         else {
-            LJsonObject obj = new LJsonObject();
+            HashMap<String, Object> map = new HashMap<>();
             for (LuaValue k :
                     tbl.keys()) {
-                obj.put(k.toString(), fromLuaValue(tbl.get(k)));
+                map.put(k.toString(), fromLuaValue(tbl.get(k)));
             }
-            return obj;
+            return map;
         }
     }
 }
