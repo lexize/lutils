@@ -5,7 +5,7 @@ import org.moon.figura.lua.LuaWhitelist;
 
 @LuaWhitelist
 public class LStreamProvider extends LProvider<LInputStream> {
-    public LInputStream getStream(LInputStream source) {
+    public LInputStream getStream(Object source) {
         return source;
     }
 }

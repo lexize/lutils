@@ -6,6 +6,7 @@ import org.lexize.lutils.submodules.json.LJsonSerializer;
 import org.moon.figura.lua.LuaWhitelist;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @LuaWhitelist
 public class LJsonReader extends LReader<Object> {
@@ -14,9 +15,9 @@ public class LJsonReader extends LReader<Object> {
         this.serializer = serializer;
     }
     @Override
-    public Object readFrom(LInputStream stream) {
+    public Object readFrom(InputStream stream) {
         try {
-            byte[] jsonStringBytes = stream.readAll();
+            byte[] jsonStringBytes = stream.readAllBytes();
             String json = new String(jsonStringBytes);
             return serializer.deserialize(json);
         } catch (IOException e) {

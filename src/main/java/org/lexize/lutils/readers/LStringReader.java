@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class LStringReader extends LReader<String> {
     @LuaWhitelist
     @Override
-    public String readFrom(LInputStream stream) {
+    public String readFrom(InputStream stream) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             stream.transferTo(baos);

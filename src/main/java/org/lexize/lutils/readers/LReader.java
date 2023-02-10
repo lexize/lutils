@@ -8,9 +8,6 @@ import org.moon.figura.lua.LuaWhitelist;
 import java.io.InputStream;
 
 public abstract class LReader<T> {
-    public T readFrom(InputStream stream) {
-        return readFrom(new LJavaInputStream(stream));
-    }
     @LuaWhitelist
-    public abstract T readFrom(LInputStream stream);
+    public abstract T readFrom(InputStream stream);
 }
