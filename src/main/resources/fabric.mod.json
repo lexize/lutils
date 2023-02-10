@@ -7,6 +7,9 @@
   "entrypoints": {
     "figura_api": [
       "org.lexize.lutils.LUtils"
+    ],
+    "figura_permissions": [
+      "org.lexize.lutils.LUtilsTrust"
     ]
   }
 }

@@ -10,6 +10,8 @@ import org.lexize.lutils.streams.LJavaInputStream;
 import org.lexize.lutils.streams.LJavaOutputStream;
 import org.lexize.lutils.streams.LLuaInputStream;
 import org.lexize.lutils.streams.LLuaOutputStream;
+import org.lexize.lutils.submodules.LProviders;
+import org.lexize.lutils.submodules.LReaders;
 import org.lexize.lutils.submodules.http.LHttp;
 import org.lexize.lutils.submodules.http.LHttpResponse;
 import org.lexize.lutils.submodules.json.LJson;
@@ -25,11 +27,13 @@ import java.util.List;
 
 @LuaWhitelist
 public class LUtils implements FiguraAPI {
-    private final LJson json = new LJson();;
-    private final LHttp http = new LHttp();
+    private LJson json = new LJson();
+    private LHttp http = null;
+    private Avatar avatar;
     public LUtils() {}
     public LUtils(Avatar avatar) {
-
+        this.avatar = avatar;
+        http = new LHttp(avatar);
     }
     @Override
     public FiguraAPI build(Avatar avatar) {
@@ -41,6 +45,8 @@ public class LUtils implements FiguraAPI {
         return switch (key) {
             case "json" -> json;
             case "http" -> http;
+            case "providers" -> LProviders.INSTANCE;
+            case "readers" -> LReaders.INSTANCE;
             default -> null;
         };
     }
@@ -68,8 +74,12 @@ public class LUtils implements FiguraAPI {
                 LLuaInputStream.class,
                 LLuaOutputStream.class,
 
+                LReaders.class,
+
                 LStringReader.class,
                 LJsonReader.class,
+
+                LProviders.class,
 
                 LStringProvider.class,
                 LStreamProvider.class,

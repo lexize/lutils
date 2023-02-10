@@ -1,10 +1,16 @@
 package org.lexize.lutils.submodules.http;
 
+import org.lexize.lutils.LUtilsTrust;
 import org.lexize.lutils.misc.LFuture;
 import org.lexize.lutils.providers.LProvider;
 import org.lexize.lutils.readers.LReader;
 import org.lexize.lutils.streams.LJavaInputStream;
+import org.luaj.vm2.LuaError;
+import org.moon.figura.FiguraMod;
+import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.LuaWhitelist;
+import org.moon.figura.permissions.FiguraPermissions;
+import org.moon.figura.permissions.Permissions;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +23,15 @@ import java.util.Map;
 
 @LuaWhitelist
 public class LHttp {
+    private static final LuaError NO_PERMISSION = new LuaError("This avatar don't have permission to use HTTP requests");
     private final HttpClient httpClient;
-    public LHttp() {
+    private final Avatar avatar;
+    public LHttp(Avatar avatar) {
+        this.avatar = avatar;
         httpClient = HttpClient.newBuilder().build();
+    }
+    private void permissionCheck() {
+        if (avatar.permissions.get(LUtilsTrust.HTTP_PERMISSION) == 0) throw NO_PERMISSION;
     }
     private HttpRequest.Builder requestBuilder(String uri, HashMap<String, String> headers) {
         HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(uri));
@@ -33,7 +45,13 @@ public class LHttp {
     }
 
     @LuaWhitelist
+    public boolean canSendHTTPRequests() {
+        return avatar.permissions.get(LUtilsTrust.HTTP_PERMISSION) > 0;
+    }
+
+    @LuaWhitelist
     public <R> LHttpResponse<R> get(String uri, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -43,6 +61,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public LHttpResponse<LJavaInputStream> getStream(String uri, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -50,6 +69,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <R> LFuture<LHttpResponse<R>> getAsync(String uri, LReader<R> reader, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<R>> future = new LFuture<>();
@@ -69,6 +89,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public LFuture<LHttpResponse<LJavaInputStream>> getStreamAsync(String uri, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).GET();
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<LJavaInputStream>> future = new LFuture<>();
@@ -89,6 +110,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LHttpResponse<R> post(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -98,6 +120,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P> LHttpResponse<LJavaInputStream> postStream(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -105,6 +128,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LFuture<LHttpResponse<R>> postAsync(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<R>> future = new LFuture<>();
@@ -124,6 +148,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LFuture<LHttpResponse<LJavaInputStream>> postStreamAsync(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = postBuilder(uri, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<LJavaInputStream>> future = new LFuture<>();
@@ -144,6 +169,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LHttpResponse<R> put(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -153,6 +179,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P> LHttpResponse<LJavaInputStream> putStream(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -160,6 +187,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LFuture<LHttpResponse<R>> putAsync(String uri, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<R>> future = new LFuture<>();
@@ -179,6 +207,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LFuture<LHttpResponse<LJavaInputStream>> putStreamAsync(String uri, P data, LProvider<P> provider, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = putBuilder(uri, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<LJavaInputStream>> future = new LFuture<>();
@@ -193,6 +222,7 @@ public class LHttp {
 
     @LuaWhitelist
     public <R> LHttpResponse<R> delete(String uri, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -202,6 +232,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public LHttpResponse<LJavaInputStream> deleteStream(String uri, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -209,6 +240,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <R> LFuture<LHttpResponse<R>> deleteAsync(String uri, LReader<R> reader, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<R>> future = new LFuture<>();
@@ -228,6 +260,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public LFuture<LHttpResponse<LJavaInputStream>> deleteStreamAsync(String uri, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = requestBuilder(uri, headers).DELETE();
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<LJavaInputStream>> future = new LFuture<>();
@@ -248,6 +281,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LHttpResponse<R> method(String uri, String method, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -257,6 +291,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P> LHttpResponse<LJavaInputStream> methodStream(String uri, String method, P data, LProvider<P> provider, HashMap<String, String> headers) throws IOException, InterruptedException {
+        permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
         var d = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         InputStream stream = d.body();
@@ -264,6 +299,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LFuture<LHttpResponse<R>> methodAsync(String uri, String method, P data, LProvider<P> provider, LReader<R> reader, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<R>> future = new LFuture<>();
@@ -283,6 +319,7 @@ public class LHttp {
     }
     @LuaWhitelist
     public <P,R> LFuture<LHttpResponse<LJavaInputStream>> methodStreamAsync(String uri, String method, P data, LProvider<P> provider, HashMap<String, String> headers) {
+        permissionCheck();
         var builder = methodBuilder(uri, method, data, provider, headers);
         var f = httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
         LFuture<LHttpResponse<LJavaInputStream>> future = new LFuture<>();
