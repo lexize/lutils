@@ -40,7 +40,7 @@ public class LFile {
         if (path != null) {
             Path folderPath = getFolderPath();
             var p = path.toAbsolutePath().normalize();
-            if (!p.startsWith(folderPath)) throw new LuaError("Path %s is not in %s".formatted(p, folderPath));
+            if (p.compareTo(folderPath) < 1) throw new LuaError("Path %s is not in or equal to %s".formatted(p, folderPath));
         }
         getFolderPath().toFile().mkdirs();
     }
@@ -88,5 +88,49 @@ public class LFile {
         lis.transferTo(fos);
         lis.close();
         fos.close();
+    }
+
+    @LuaWhitelist
+    @LDescription("Deletes file/folder by specified path")
+    public boolean delete(String path) {
+        Path filePath = getFolderPath().resolve(path);
+        doPreparations(filePath);
+        return filePath.toFile().delete();
+    }
+    @LuaWhitelist
+    @LDescription("Creates folder by specified path")
+    public boolean mkdir(String path) {
+        Path folderPath = getFolderPath().resolve(path);
+        doPreparations(folderPath);
+        return folderPath.toFile().mkdir();
+    }
+
+    @LuaWhitelist
+    @LDescription("Creates all folders in specified path if they're not exists")
+    public boolean mkdirs(String path) {
+        Path folderPath = getFolderPath().resolve(path);
+        doPreparations(folderPath);
+        return folderPath.toFile().mkdir();
+    }
+
+    @LuaWhitelist
+    public boolean exists(String path) {
+        Path filePath = getFolderPath().resolve(path);
+        doPreparations(filePath);
+        return filePath.toFile().exists();
+    }
+
+    @LuaWhitelist
+    public boolean isDirectory(String path) {
+        Path filePath = getFolderPath().resolve(path);
+        doPreparations(filePath);
+        return filePath.toFile().isDirectory();
+    }
+
+    @LuaWhitelist
+    public boolean isFile(String path) {
+        Path filePath = getFolderPath().resolve(path);
+        doPreparations(filePath);
+        return filePath.toFile().isFile();
     }
 }
