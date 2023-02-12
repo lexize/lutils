@@ -86,7 +86,7 @@ To show how to write bytes into file, we'll just copy bytes of previous file int
 local writeStream = file:openOutputStream("test_file_copy.json");
 -- Iterating over table with bytes
 for i, v in ipairs(byteArr) do
-    writeStream:write(i);
+    writeStream:write(v);
 end
 writeStream:close(); -- Closing stream to apply changes
 ```
