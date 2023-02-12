@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 @LuaWhitelist
 public class LFile {
@@ -35,14 +36,18 @@ public class LFile {
     private Path getFolderPath() {
         return FiguraMod.getFiguraDirectory().resolve("data/%s".formatted(folderName)).toAbsolutePath().normalize();
     }
-    private void doPreparations(Path path) {
+    private void doPreparations(Path path, int minDiff) {
         if (folderName == null) throw new LuaError("Folder name isn't set");
         if (path != null) {
             Path folderPath = getFolderPath();
             var p = path.toAbsolutePath().normalize();
-            if (p.compareTo(folderPath) < 1) throw new LuaError("Path %s is not in or equal to %s".formatted(p, folderPath));
+            if (p.compareTo(folderPath) < minDiff) throw new LuaError("Path %s is not in or equal to %s".formatted(p, folderPath));
         }
         getFolderPath().toFile().mkdirs();
+    }
+
+    private void doPreparations(Path path) {
+        doPreparations(path,1);
     }
 
     @LuaWhitelist
@@ -114,13 +119,15 @@ public class LFile {
     }
 
     @LuaWhitelist
+    @LDescription("Checks, is element by specified path exists")
     public boolean exists(String path) {
         Path filePath = getFolderPath().resolve(path);
-        doPreparations(filePath);
+        doPreparations(filePath, 0);
         return filePath.toFile().exists();
     }
 
     @LuaWhitelist
+    @LDescription("Checks, is element by specified path is directory")
     public boolean isDirectory(String path) {
         Path filePath = getFolderPath().resolve(path);
         doPreparations(filePath);
@@ -128,9 +135,23 @@ public class LFile {
     }
 
     @LuaWhitelist
+    @LDescription("Checks, is element by specified path is file")
     public boolean isFile(String path) {
         Path filePath = getFolderPath().resolve(path);
         doPreparations(filePath);
         return filePath.toFile().isFile();
+    }
+
+    @LuaWhitelist
+    @LDocsFuncOverload(
+            returnType = String[].class,
+            argumentNames = "path",
+            argumentTypes = String.class,
+            description = "Returns table with file paths in specified directory"
+    )
+    public List<String> list(String path) {
+        Path folderPath = getFolderPath().resolve(path);
+        doPreparations(folderPath, 0);
+        return List.of(folderPath.toFile().list());
     }
 }
