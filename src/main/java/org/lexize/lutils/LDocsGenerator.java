@@ -20,8 +20,8 @@ public class LDocsGenerator {
                 classes) {
             StringBuilder sb = new StringBuilder();
             sb.append("# %s\n".formatted(c.getSimpleName()));
-            if (isAnnotationPresent(c, LDescription.class)) {
-                LDescription d = getAnnotation(c,LDescription.class);
+            if (c.isAnnotationPresent(LDescription.class)) {
+                LDescription d = c.getAnnotation(LDescription.class);
                 String v = d.resource() ? getResource(d.value()) : d.value();
                 sb.append(v).append("\n");
             }
@@ -43,11 +43,11 @@ public class LDocsGenerator {
                 }
                 fieldsPresent = true;
             }
-            Method[] methods = c.getDeclaredMethods();
+            Method[] methods = c.getMethods();
             List<Method> whitelistedMethods = new ArrayList<>();
             for (Method m :
                     methods) {
-                if ((m.isAnnotationPresent(LuaWhitelist.class) || m.isAnnotationPresent(LInclude.class)) && !m.getName().startsWith("__")) whitelistedMethods.add(m);
+                if (!m.getName().startsWith("__") && isAnnotationPresent(m,LuaWhitelist.class)) whitelistedMethods.add(m);
             }
 
             List<String> checkedMethods = new ArrayList<>();
@@ -57,10 +57,16 @@ public class LDocsGenerator {
                 for (int i = 0; i < whitelistedMethods.size(); i++) {
                     Method m = whitelistedMethods.get(i);
                     if (checkedMethods.stream().anyMatch(m.getName()::equals)) continue;
-                    LDocsFuncOverload[] overloads = m.getAnnotationsByType(LDocsFuncOverload.class);
-                    if (overloads.length > 0) {
+                    LDocsFuncOverloads overloads = getAnnotation(m, LDocsFuncOverloads.class);
+                    LDocsFuncOverload[] overloadsArray;
+                    if (overloads != null) overloadsArray = overloads.value();
+                    else {
+                         LDocsFuncOverload overload = getAnnotation(m, LDocsFuncOverload.class);
+                        overloadsArray = overload != null ? new LDocsFuncOverload[] { overload } : new LDocsFuncOverload[0];
+                    }
+                    if (overloadsArray.length > 0) {
                         for (LDocsFuncOverload overload :
-                                overloads) {
+                                overloadsArray) {
                             appendFuncOverload(sb, overload, classes, m.getName());
                         }
                     }
@@ -126,10 +132,10 @@ public class LDocsGenerator {
             String refName = ArrayUtils.contains(classes, retType) ? "[%s](./%s.md)".formatted(typeName, typeName) : typeName;
             methodDescriptor.append(" -> %s".formatted(refName));
         }
-        boolean hasDescription = m.isAnnotationPresent(LDescription.class);
+        boolean hasDescription = isAnnotationPresent(m,LDescription.class);
         sb.append("**%s**".formatted(methodDescriptor));
         if (hasDescription) {
-            LDescription desc = m.getAnnotation(LDescription.class);
+            LDescription desc = getAnnotation(m,LDescription.class);
             sb.append("\\\n");
             sb.append(desc.resource() ? getResource(desc.value()) : desc.value());
         }
@@ -192,5 +198,30 @@ public class LDocsGenerator {
             methods.addAll(Arrays.asList(getAllMethods(i)));
         }
         return methods.toArray(new Method[0]);
+    }
+
+    private static <T extends Annotation> T getAnnotation(Method m, Class<T> annotationClass) {
+        if (m.isAnnotationPresent(annotationClass)) {
+            return m.getAnnotation(annotationClass);
+        }
+        Class<?> sc = m.getDeclaringClass().getSuperclass();
+        if (sc != null) {
+            try {
+                return getAnnotation(sc.getMethod(m.getName(), m.getParameterTypes()), annotationClass);
+            } catch (NoSuchMethodException ignored) {}
+        }
+        return null;
+    }
+    private static <T extends Annotation> boolean isAnnotationPresent(Method m, Class<T> annotationClass) {
+        if (m.isAnnotationPresent(annotationClass)) {
+            return m.isAnnotationPresent(annotationClass);
+        }
+        Class<?> sc = m.getDeclaringClass().getSuperclass();
+        if (sc != null) {
+            try {
+                return isAnnotationPresent(sc.getMethod(m.getName(), m.getParameterTypes()), annotationClass);
+            } catch (NoSuchMethodException ignored) {}
+        }
+        return false;
     }
 }

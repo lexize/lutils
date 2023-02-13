@@ -1,5 +1,7 @@
 package org.lexize.lutils.streams;
 
+import org.lexize.lutils.annotations.LField;
+import org.lexize.lutils.annotations.LInclude;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
@@ -7,6 +9,13 @@ import org.moon.figura.lua.LuaWhitelist;
 import java.io.IOException;
 
 @LuaWhitelist
+@LField(value = "onRead", type = LuaFunction.class, description = "Function called when read() method is called. Should return int")
+@LField(value = "onSkip", type = LuaFunction.class, description = "Function called when skip() method is called. Should return long")
+@LField(value = "availableCount", type = LuaFunction.class, description = "Function that should return amount of bytes available to read")
+@LField(value = "onClose", type = LuaFunction.class, description = "Function called when close() method is called.")
+@LField(value = "onMark", type = LuaFunction.class, description = "Function called when mark() method is called.")
+@LField(value = "onReset", type = LuaFunction.class, description = "Function called when reset() method is called.")
+@LField(value = "isMarkSupported", type = LuaFunction.class, description = "Function that should return true if mark supported for this stream, false otherwise")
 public class LLuaInputStream extends LInputStream{
     private LuaFunction onRead, onSkip, availableCount, onClose, onMark, onReset, isMarkSupported;
     @Override
