@@ -1,7 +1,7 @@
 # LLuaOutputStream
 ## Functions
-**flush()**\
-\
-**write(int arg0)**\
-\
+**flush()**
+
+**write(int arg0)**
+
 **close()**

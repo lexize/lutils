@@ -3,7 +3,7 @@ package org.lexize.lutils.annotations;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Inherited
 public @interface LDocsFuncOverloads {
     LDocsFuncOverload[] value();

@@ -17,9 +17,10 @@ import org.lexize.lutils.submodules.LReaders;
 import org.lexize.lutils.submodules.http.LHttp;
 import org.lexize.lutils.submodules.http.LHttpResponse;
 import org.lexize.lutils.submodules.json.LJson;
-import org.lexize.lutils.submodules.json.LJsonArray;
-import org.lexize.lutils.submodules.json.LJsonObject;
 import org.lexize.lutils.submodules.json.LJsonSerializer;
+import org.lexize.lutils.submodules.regex.LRegex;
+import org.lexize.lutils.submodules.regex.LRegexGroup;
+import org.lexize.lutils.submodules.regex.LRegexMatch;
 import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.FiguraAPI;
 import org.moon.figura.lua.LuaWhitelist;
@@ -40,9 +41,10 @@ import java.util.List;
 @LField(value = "readers", type = LReaders.class, description = "Submodule containing all readers that don't have to be created by user")
 public class LUtils implements FiguraAPI {
 
-    private LJson json = new LJson();
+    private final LJson json = new LJson();
     private LHttp http = null;
-    private LFile file = new LFile();
+    private final LFile file = new LFile();
+    private final LRegex regex = new LRegex();
     private Avatar avatar;
     public LUtils() {}
     public LUtils(Avatar avatar) {
@@ -62,6 +64,7 @@ public class LUtils implements FiguraAPI {
             case "providers" -> LProviders.INSTANCE;
             case "readers" -> LReaders.INSTANCE;
             case "file" -> avatar.isHost ? file : null;
+            case "regex" -> regex;
             default -> null;
         };
     }
@@ -125,6 +128,10 @@ public class LUtils implements FiguraAPI {
 
             LFile.class,
 
-            LFuture.class
+            LFuture.class,
+
+            LRegex.class,
+            LRegexGroup.class,
+            LRegexMatch.class
     };
 }

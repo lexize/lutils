@@ -1,10 +1,10 @@
 # LHttpResponse
 ## Functions
 **getCode() -> int**\
-Returns response code\
-\
+Returns response code
+
 **getData() -> Object**\
-Returns response data\
-\
+Returns response data
+
 **getHeaders() -> LuaTable**\
 Returns response headers

@@ -14,7 +14,8 @@ public class LStringProvider extends LProvider<String> {
     @LDocsFuncOverload(
             argumentTypes = String.class,
             argumentNames = "source",
-            description = "Returns stream with bytes of provided string"
+            description = "Returns stream with bytes of provided string",
+            returnType = LInputStream.class
     )
     public LInputStream getStream(String source) {
         return new LJavaInputStream(new ByteArrayInputStream(source.getBytes()));

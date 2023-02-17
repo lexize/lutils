@@ -54,28 +54,27 @@ public class LDocsGenerator {
             if (whitelistedMethods.size() > 0) {
                 if (fieldsPresent) sb.append("\n");
                 sb.append("## Functions\n");
-                for (int i = 0; i < whitelistedMethods.size(); i++) {
-                    Method m = whitelistedMethods.get(i);
+                List<String> functionDocs = new ArrayList<>();
+                for (Method m : whitelistedMethods) {
                     if (checkedMethods.stream().anyMatch(m.getName()::equals)) continue;
                     LDocsFuncOverloads overloads = getAnnotation(m, LDocsFuncOverloads.class);
                     LDocsFuncOverload[] overloadsArray;
                     if (overloads != null) overloadsArray = overloads.value();
                     else {
-                         LDocsFuncOverload overload = getAnnotation(m, LDocsFuncOverload.class);
-                        overloadsArray = overload != null ? new LDocsFuncOverload[] { overload } : new LDocsFuncOverload[0];
+                        LDocsFuncOverload overload = getAnnotation(m, LDocsFuncOverload.class);
+                        overloadsArray = overload != null ? new LDocsFuncOverload[]{overload} : new LDocsFuncOverload[0];
                     }
                     if (overloadsArray.length > 0) {
                         for (LDocsFuncOverload overload :
                                 overloadsArray) {
-                            appendFuncOverload(sb, overload, classes, m.getName());
+                            functionDocs.add(appendFuncOverload(overload, classes, m.getName()));
                         }
+                    } else {
+                        functionDocs.add(appendStandardMethod(m, classes));
                     }
-                    else {
-                        appendStandardMethod(sb,m,classes);
-                    }
-                    if (i < whitelistedMethods.size() -1) sb.append("\\\n\\\n");
                     checkedMethods.add(m.getName());
                 }
+                sb.append(String.join("\n\n", functionDocs));
             }
 
             File outputFile = outputPath.resolve("%s.md".formatted(c.getSimpleName())).toFile();
@@ -86,7 +85,8 @@ public class LDocsGenerator {
         }
     }
 
-    private static void appendFuncOverload(StringBuilder sb, LDocsFuncOverload overload, Class<?>[] classes, String funcName) throws IOException {
+    private static String appendFuncOverload(LDocsFuncOverload overload, Class<?>[] classes, String funcName) throws IOException {
+        StringBuilder sb = new StringBuilder();
         StringBuilder methodDescriptor = new StringBuilder();
         methodDescriptor.append(funcName).append("(");
         List<String> argDescriptors = new ArrayList<>();
@@ -102,7 +102,9 @@ public class LDocsGenerator {
         Class<?> retType = overload.returnType();
         if (retType != LDocsFuncOverload.DEFAULT_TYPE.class) {
             String typeName = retType.getSimpleName();
-            String refName = ArrayUtils.contains(classes, retType) ? "[%s](./%s.md)".formatted(typeName, typeName) : typeName;
+            Class<?> bType = (retType.isArray() ? retType.componentType() : retType);
+            String bName = bType.getSimpleName();
+            String refName = Arrays.asList(classes).contains(bType) ? "[%s](./%s.md)".formatted(typeName, bName) : typeName;
             methodDescriptor.append(" -> %s".formatted(refName));
         }
         boolean hasDescription = !overload.description().isEmpty();
@@ -111,9 +113,11 @@ public class LDocsGenerator {
             sb.append("\\\n");
             sb.append(overload.resource() ? getResource(overload.description()) : overload.description());
         }
+        return sb.toString();
     }
 
-    private static void appendStandardMethod(StringBuilder sb, Method m, Class<?>[] classes) throws IOException {
+    private static String appendStandardMethod(Method m, Class<?>[] classes) throws IOException {
+        StringBuilder sb = new StringBuilder();
         StringBuilder methodDescriptor = new StringBuilder();
         methodDescriptor.append(m.getName()).append("(");
         List<String> argDescriptors = new ArrayList<>();
@@ -129,7 +133,9 @@ public class LDocsGenerator {
         Class<?> retType = m.getReturnType();
         if (retType != Void.TYPE) {
             String typeName = retType.getSimpleName();
-            String refName = ArrayUtils.contains(classes, retType) ? "[%s](./%s.md)".formatted(typeName, typeName) : typeName;
+            Class<?> bType = (retType.isArray() ? retType.componentType() : retType);
+            String bName = bType.getSimpleName();
+            String refName = Arrays.asList(classes).contains(bType) ? "[%s](./%s.md)".formatted(typeName, bName) : typeName;
             methodDescriptor.append(" -> %s".formatted(refName));
         }
         boolean hasDescription = isAnnotationPresent(m,LDescription.class);
@@ -139,6 +145,7 @@ public class LDocsGenerator {
             sb.append("\\\n");
             sb.append(desc.resource() ? getResource(desc.value()) : desc.value());
         }
+        return sb.toString();
     }
 
     private static String getResource(String name) throws IOException {
