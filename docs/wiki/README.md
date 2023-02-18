@@ -4,4 +4,4 @@ LUtils adds some features that don't fit into Figura, but may be very useful som
 Current submodules list:
 - [Json](./json_submodule.md)
 - [File](./file_submodule.md)
-- [Http](../api_reference/LHttp.md)
+- [Http](./http_submodule.md)

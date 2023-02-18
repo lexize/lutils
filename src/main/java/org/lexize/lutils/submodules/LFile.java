@@ -41,7 +41,7 @@ public class LFile {
         if (path != null) {
             Path folderPath = getFolderPath();
             var p = path.toAbsolutePath().normalize();
-            if (p.compareTo(folderPath) < minDiff) throw new LuaError("Path %s is not in or equal to %s".formatted(p, folderPath));
+            if (!p.startsWith(folderPath) || p.compareTo(folderPath) < minDiff) throw new LuaError("Path %s is not in or equal to %s".formatted(p, folderPath));
         }
         getFolderPath().toFile().mkdirs();
     }

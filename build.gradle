@@ -26,13 +26,14 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:$loader_version"
 
-    modImplementation "com.github.Kingdom-of-The-Moon:FiguraRewriteRewrite:${figura_version}"
+    modImplementation "com.github.Kingdom-of-The-Moon:FiguraRewriteRewrite:${figura_build_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
 }
 
 processResources {
     Map<String, Object> properties = new HashMap<>()
 
+    properties.put("figura_version", figura_version);
     properties.put("java_version", java_version)
     properties.put("mod_version", mod_version);
     properties.put("fabric_api_version", fabric_api_version);

@@ -11,5 +11,8 @@
     "figura_permissions": [
       "org.lexize.lutils.LUtilsTrust"
     ]
+  },
+  "depends": {
+    "figura": ">=${figura_version}"
   }
 }
