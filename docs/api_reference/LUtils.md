@@ -10,4 +10,8 @@ File submodule of LUtils\
 **[LProviders](./LProviders.md) providers**\
 Submodule containing all providers that don't have to be created by user\
 **[LReaders](./LReaders.md) readers**\
-Submodule containing all readers that don't have to be created by user
+Submodule containing all readers that don't have to be created by user\
+**[LRegex](./LRegex.md) regex**\
+RegEx submodule of LUtils\
+**[LMisc](./LMisc.md) misc**\
+Misc submodule of LUtils

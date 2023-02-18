@@ -12,6 +12,7 @@ import org.lexize.lutils.readers.LReader;
 import org.lexize.lutils.readers.LStringReader;
 import org.lexize.lutils.streams.*;
 import org.lexize.lutils.submodules.LFile;
+import org.lexize.lutils.submodules.LMisc;
 import org.lexize.lutils.submodules.LProviders;
 import org.lexize.lutils.submodules.LReaders;
 import org.lexize.lutils.submodules.http.LHttp;
@@ -39,12 +40,15 @@ import java.util.List;
 @LField(value = "file", type = LFile.class, description = "File submodule of LUtils")
 @LField(value = "providers", type = LProviders.class, description = "Submodule containing all providers that don't have to be created by user")
 @LField(value = "readers", type = LReaders.class, description = "Submodule containing all readers that don't have to be created by user")
+@LField(value = "regex", type = LRegex.class, description = "RegEx submodule of LUtils")
+@LField(value = "misc", type = LMisc.class, description = "Misc submodule of LUtils")
 public class LUtils implements FiguraAPI {
 
-    private final LJson json = new LJson();
+    private static final LJson json = new LJson();
     private LHttp http = null;
     private final LFile file = new LFile();
-    private final LRegex regex = new LRegex();
+    private final LMisc misc = new LMisc();
+    private static final LRegex regex = new LRegex();
     private Avatar avatar;
     public LUtils() {}
     public LUtils(Avatar avatar) {
@@ -65,6 +69,7 @@ public class LUtils implements FiguraAPI {
             case "readers" -> LReaders.INSTANCE;
             case "file" -> avatar.isHost ? file : null;
             case "regex" -> regex;
+            case "misc" -> misc;
             default -> null;
         };
     }
@@ -132,6 +137,8 @@ public class LUtils implements FiguraAPI {
 
             LRegex.class,
             LRegexGroup.class,
-            LRegexMatch.class
+            LRegexMatch.class,
+
+            LMisc.class
     };
 }

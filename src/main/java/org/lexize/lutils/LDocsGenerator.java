@@ -31,8 +31,11 @@ public class LDocsGenerator {
                 sb.append("## Fields\n");
                 for (int i = 0; i < fields.length; i++) {
                     LField f = fields[i];
-                    String typeName = f.type().getSimpleName();
-                    String refName = ArrayUtils.contains(classes, f.type()) ? "[%s](./%s.md)".formatted(typeName, typeName) : typeName;
+                    var retType = f.type();
+                    String typeName = retType.getSimpleName();
+                    Class<?> bType = (retType.isArray() ? retType.componentType() : retType);
+                    String bName = bType.getSimpleName();
+                    String refName = Arrays.asList(classes).contains(bType) ? "[%s](./%s.md)".formatted(typeName, bName) : typeName;
                     boolean hasDesc = !f.description().isEmpty();
                     boolean lastOne = i == fields.length - 1;
                     sb.append("**%s %s**%s".formatted(refName, f.value(), hasDesc || !lastOne ? "\\\n" : ""));
@@ -91,10 +94,12 @@ public class LDocsGenerator {
         methodDescriptor.append(funcName).append("(");
         List<String> argDescriptors = new ArrayList<>();
         for (int i = 0; i < overload.argumentTypes().length; i++) {
-            Class<?> argType = overload.argumentTypes()[i];
-            String typeName = argType.getSimpleName();
             String argumentName = overload.argumentNames()[i];
-            String refName = ArrayUtils.contains(classes, argType) ? "[%s](./%s.md)".formatted(typeName, typeName) : typeName;
+            Class<?> retType = overload.argumentTypes()[i];
+            String typeName = retType.getSimpleName();
+            Class<?> bType = (retType.isArray() ? retType.componentType() : retType);
+            String bName = bType.getSimpleName();
+            String refName = Arrays.asList(classes).contains(bType) ? "[%s](./%s.md)".formatted(typeName, bName) : typeName;
             argDescriptors.add("%s %s".formatted(refName, argumentName));
         }
         methodDescriptor.append(String.join(", ", argDescriptors));

@@ -3,4 +3,4 @@
 **Integer start**\
 **Integer end**\
 **String content**\
-**LRegexGroup[] groups**
+**[LRegexGroup[]](./LRegexGroup.md) groups**

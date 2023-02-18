@@ -8,6 +8,7 @@ import org.moon.figura.lua.LuaWhitelist;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 @LuaWhitelist
@@ -19,14 +20,21 @@ public class LRegexMatch {
     private final String content;
     private final int start;
     private final int end;
-    private final List<LRegexGroup> groups;
+    private final HashMap<Object,LRegexGroup> groups;
     public LRegexMatch(Matcher m) {
+        var groupNames = new HashMap<Integer, String>();
+        for (Map.Entry<String, Integer> kv :
+                LRegex.getGroupNames(m).entrySet()) {
+            groupNames.put(kv.getValue(), kv.getKey());
+        }
         content = m.group();
         start = m.start();
         end = m.end();
-        ArrayList<LRegexGroup> groups = new ArrayList<>();
+        HashMap<Object,LRegexGroup> groups = new HashMap<Object,LRegexGroup>();
         for (int i = 1; i <= m.groupCount(); i++) {
-            groups.add(new LRegexGroup(m.group(i), m.start(i), m.end(i)));
+            var g = new LRegexGroup(m.group(i), m.start(i), m.end(i));
+            groups.put(i,g);
+            if (groupNames.containsKey(i)) groups.put(groupNames.get(i), g);
         }
         this.groups = groups;
     }

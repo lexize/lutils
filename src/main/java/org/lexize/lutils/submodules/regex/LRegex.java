@@ -7,9 +7,14 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
+import org.moon.figura.lua.ReadOnlyLuaTable;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @LuaWhitelist
@@ -74,9 +79,9 @@ public class LRegex {
                 groupTable.set("start", m.start(i));
                 groupTable.set("end", m.end(i));
                 groupTable.set("content", m.group(i));
-                groups.add(groupTable);
+                groups.add(new ReadOnlyLuaTable(groupTable));
             }
-            var r = f.invoke(new LuaValue[] {LuaValue.valueOf(m.group()), LuaValue.valueOf(m.start()), LuaValue.valueOf(m.end()), groups});
+            var r = f.invoke(new LuaValue[] {LuaValue.valueOf(m.group()), LuaValue.valueOf(m.start()), LuaValue.valueOf(m.end()), new ReadOnlyLuaTable(groups)});
             return r.tojstring();
         });
     }
@@ -116,5 +121,22 @@ public class LRegex {
             var r = f.invoke(new LuaValue[] {LuaValue.valueOf(m.group()), LuaValue.valueOf(m.start()), LuaValue.valueOf(m.end()), groups});
             return r.tojstring();
         });
+    }
+
+    static Map<String, Integer> getGroupNames(Matcher m) {
+        try {
+            Class<Matcher> mc = Matcher.class;
+            Class<Pattern> pc = Pattern.class;
+
+            Field parentPatternField = mc.getDeclaredField("parentPattern");
+            Method namedGroupsMethod = pc.getDeclaredMethod("namedGroups");
+            parentPatternField.trySetAccessible();
+            namedGroupsMethod.trySetAccessible();
+            Pattern p = (Pattern) (parentPatternField.get(m));
+            return (Map<String,Integer>) (namedGroupsMethod.invoke(p));
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
