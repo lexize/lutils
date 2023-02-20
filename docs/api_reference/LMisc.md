@@ -1,5 +1,7 @@
 # LMisc
 Submodule functions that cant be categorized
+## Fields
+**LuaTable encodings**
 ## Functions
 **stringToBytes(String string, String charset) -> byte[]**\
 Gets bytes of specified string with specified charset. If charset not specified UTF_8 will be used

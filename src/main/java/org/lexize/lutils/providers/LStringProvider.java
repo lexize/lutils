@@ -7,9 +7,20 @@ import org.lexize.lutils.streams.LJavaInputStream;
 import org.moon.figura.lua.LuaWhitelist;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @LuaWhitelist
 public class LStringProvider extends LProvider<String> {
+    public final Charset charset;
+
+    public LStringProvider() {
+        this.charset = StandardCharsets.UTF_8;
+    }
+    public LStringProvider(Charset charset) {
+        this.charset = charset;
+    }
+
     @LInclude
     @LDocsFuncOverload(
             argumentTypes = String.class,
@@ -18,6 +29,6 @@ public class LStringProvider extends LProvider<String> {
             returnType = LInputStream.class
     )
     public LInputStream getStream(String source) {
-        return new LJavaInputStream(new ByteArrayInputStream(source.getBytes()));
+        return new LJavaInputStream(new ByteArrayInputStream(source.getBytes(charset)));
     }
 }

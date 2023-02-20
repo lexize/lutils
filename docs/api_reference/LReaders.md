@@ -1,3 +1,9 @@
 # LReaders
 ## Fields
-**[LStringReader](./LStringReader.md) string**
+**[LStringReader](./LStringReader.md) string**\
+**[LStringReader](./LStringReader.md) string_utf8**\
+**[LStringReader](./LStringReader.md) string_utf16**\
+**[LStringReader](./LStringReader.md) string_utf16be**\
+**[LStringReader](./LStringReader.md) string_utf16le**\
+**[LStringReader](./LStringReader.md) string_iso88591**\
+**[LStringReader](./LStringReader.md) string_us_ascii**

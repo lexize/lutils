@@ -2,7 +2,11 @@ package org.lexize.lutils.submodules;
 
 import org.lexize.lutils.annotations.LDescription;
 import org.lexize.lutils.annotations.LDocsFuncOverload;
+import org.lexize.lutils.annotations.LField;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;
+import org.moon.figura.lua.ReadOnlyLuaTable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +18,7 @@ import java.util.List;
 
 @LuaWhitelist
 @LDescription("Submodule functions that cant be categorized")
+@LField(value = "encodings", type = LuaTable.class)
 public class LMisc {
     public enum CharsetVal {
         UTF_8(StandardCharsets.UTF_8),
@@ -27,6 +32,14 @@ public class LMisc {
             this.charset = charset;
         }
     }
+
+    public static ReadOnlyLuaTable ENCODINGS = new ReadOnlyLuaTable(new LuaTable() {{
+        for (CharsetVal v :
+                CharsetVal.values()) {
+            ENCODINGS.set(v.name(),v.name());
+        }
+    }});
+
     @LuaWhitelist
     @LDocsFuncOverload(argumentNames = {"string", "charset"}, argumentTypes = {String.class,String.class}, returnType = byte[].class, description =
             "Gets bytes of specified string with specified charset. If charset not specified UTF_8 will be used")
@@ -91,5 +104,14 @@ public class LMisc {
         String base64 = Base64.getEncoder().encodeToString(baos.toByteArray());
         baos.close();
         return base64;
+    }
+
+    @LuaWhitelist
+    public Object __index(LuaValue key) {
+        if (!key.isstring()) return null;
+        return switch (key.tojstring()) {
+            case "encodings" -> ENCODINGS;
+            default -> null;
+        };
     }
 }

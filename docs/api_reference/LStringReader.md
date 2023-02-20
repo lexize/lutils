@@ -1,3 +1,3 @@
 # LStringReader
 ## Functions
-**readFrom(InputStream arg0) -> String**
+**readFrom(InputStream arg0) -> Object**
