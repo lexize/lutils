@@ -8,6 +8,7 @@ import java.util.List;
 
 public class LUtilsTrust implements FiguraPermissions {
     public static final Permissions HTTP_PERMISSION = new Permissions("http",0,0,0,1,1);
+    public static final Permissions SOCKET_PERMISSION = new Permissions("socket",0,0,0,1,1);
     @Override
     public String getTitle() {
         return "lutils";
@@ -16,7 +17,8 @@ public class LUtilsTrust implements FiguraPermissions {
     @Override
     public Collection<Permissions> getPermissions() {
         return List.of(
-                HTTP_PERMISSION
+                HTTP_PERMISSION,
+                SOCKET_PERMISSION
         );
     }
 }

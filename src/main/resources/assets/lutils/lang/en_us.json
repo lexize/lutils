@@ -1,4 +1,5 @@
 {
   "lutils": "LUtils",
-  "lutils.permissions.value.http": "HTTP Requests"
+  "lutils.permissions.value.http": "HTTP Requests",
+  "lutils.permissions.value.socket": "Socket connection"
 }

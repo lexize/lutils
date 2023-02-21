@@ -36,7 +36,7 @@ public class LMisc {
     public static ReadOnlyLuaTable ENCODINGS = new ReadOnlyLuaTable(new LuaTable() {{
         for (CharsetVal v :
                 CharsetVal.values()) {
-            ENCODINGS.set(v.name(),v.name());
+            set(v.name(),v.name());
         }
     }});
 

@@ -15,10 +15,10 @@ Sends HTTP DELETE request by specified URI, and returns response data with reade
 **post(String uri, Object data, [LProvider](./LProvider.md) provider, [LReader](./LReader.md) reader, LuaTable headers) -> [LHttpResponse](./LHttpResponse.md)**\
 Sends HTTP POST request by specified URI, and returns response data with reader
 
+**canSendHTTPRequests() -> boolean**
+
 **getStream(String uri, LuaTable headers) -> [LHttpResponse](./LHttpResponse.md)**\
 Sends HTTP GET request by specified URI, and returns response with data stream
-
-**canSendHTTPRequests() -> boolean**
 
 **getAsync(String uri, [LReader](./LReader.md) reader, LuaTable headers) -> [LFuture](./LFuture.md)**\
 Sends async HTTP GET request by specified URI, and returns response data with reader

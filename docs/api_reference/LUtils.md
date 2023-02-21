@@ -5,6 +5,8 @@ Main class of LUtils. Provides access to all submodules
 JSON submodule of LUtils\
 **[LHttp](./LHttp.md) http**\
 HTTP submodule of LUtils\
+**[LSocket](./LSocket.md) socket**\
+Socket submodule of LUtils\
 **[LFile](./LFile.md) file**\
 File submodule of LUtils\
 **[LProviders](./LProviders.md) providers**\

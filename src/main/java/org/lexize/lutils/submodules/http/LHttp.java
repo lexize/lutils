@@ -34,7 +34,7 @@ public class LHttp {
         httpClient = HttpClient.newBuilder().build();
     }
     private void permissionCheck() {
-        if (avatar.permissions.get(LUtilsTrust.HTTP_PERMISSION) == 0) throw NO_PERMISSION;
+        if (!canSendHTTPRequests()) throw NO_PERMISSION;
     }
     private HttpRequest.Builder requestBuilder(String uri, HashMap<String, String> headers) {
         HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(uri));

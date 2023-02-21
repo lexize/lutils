@@ -22,6 +22,8 @@ import org.lexize.lutils.submodules.json.LJsonSerializer;
 import org.lexize.lutils.submodules.regex.LRegex;
 import org.lexize.lutils.submodules.regex.LRegexGroup;
 import org.lexize.lutils.submodules.regex.LRegexMatch;
+import org.lexize.lutils.submodules.socket.LSocket;
+import org.lexize.lutils.submodules.socket.LSocketClient;
 import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.FiguraAPI;
 import org.moon.figura.lua.LuaWhitelist;
@@ -37,6 +39,7 @@ import java.util.List;
 @LDescription("Main class of LUtils. Provides access to all submodules")
 @LField(value = "json", type = LJson.class, description = "JSON submodule of LUtils")
 @LField(value = "http", type = LHttp.class, description = "HTTP submodule of LUtils")
+@LField(value = "socket", type = LSocket.class, description = "Socket submodule of LUtils")
 @LField(value = "file", type = LFile.class, description = "File submodule of LUtils")
 @LField(value = "providers", type = LProviders.class, description = "Submodule containing all providers that don't have to be created by user")
 @LField(value = "readers", type = LReaders.class, description = "Submodule containing all readers that don't have to be created by user")
@@ -48,12 +51,14 @@ public class LUtils implements FiguraAPI {
     private LHttp http = null;
     private final LFile file = new LFile();
     private final LMisc misc = new LMisc();
+    private LSocket socket;
     private static final LRegex regex = new LRegex();
     private Avatar avatar;
     public LUtils() {}
     public LUtils(Avatar avatar) {
         this.avatar = avatar;
         http = new LHttp(avatar);
+        socket = new LSocket(avatar);
     }
     @Override
     public FiguraAPI build(Avatar avatar) {
@@ -65,6 +70,7 @@ public class LUtils implements FiguraAPI {
         return switch (key) {
             case "json" -> json;
             case "http" -> http;
+            case "socket" -> socket;
             case "providers" -> LProviders.INSTANCE;
             case "readers" -> LReaders.INSTANCE;
             case "file" -> avatar.isHost ? file : null;
@@ -139,6 +145,9 @@ public class LUtils implements FiguraAPI {
             LRegexGroup.class,
             LRegexMatch.class,
 
-            LMisc.class
+            LMisc.class,
+
+            LSocket.class,
+            LSocketClient.class
     };
 }
