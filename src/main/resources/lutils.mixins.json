@@ -1,0 +1,5 @@
+{
+  "package": "org.lexize.lutils.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": ["AvatarMixin"]
+}

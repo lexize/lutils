@@ -14,5 +14,6 @@
   },
   "depends": {
     "figura": ">=${figura_version}"
-  }
+  },
+  "mixins": ["lutils.mixins.json"]
 }
