@@ -1,7 +1,6 @@
 package org.lexize.lutils.streams;
 
 import org.lexize.lutils.annotations.LField;
-import org.lexize.lutils.annotations.LInclude;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.moon.figura.lua.LuaWhitelist;

@@ -25,12 +25,13 @@ import org.lexize.lutils.submodules.regex.LRegexMatch;
 import org.lexize.lutils.submodules.socket.LSocket;
 import org.lexize.lutils.submodules.socket.LSocketClient;
 import org.moon.figura.avatar.Avatar;
-import org.moon.figura.lua.FiguraAPI;
+import org.moon.figura.entries.FiguraAPI;
 import org.moon.figura.lua.LuaWhitelist;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,7 +47,6 @@ import java.util.List;
 @LField(value = "regex", type = LRegex.class, description = "RegEx submodule of LUtils")
 @LField(value = "misc", type = LMisc.class, description = "Misc submodule of LUtils")
 public class LUtils implements FiguraAPI {
-
     private static final LJson json = new LJson();
     private LHttp http = null;
     private final LFile file = new LFile();
@@ -95,6 +95,11 @@ public class LUtils implements FiguraAPI {
             }
         }
         return classesToRegister;
+    }
+
+    @Override
+    public Collection<Class<?>> getDocsClasses() {
+        return List.of();
     }
 
     public static void main(String[] args) throws IOException {

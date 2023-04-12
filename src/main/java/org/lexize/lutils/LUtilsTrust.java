@@ -1,6 +1,6 @@
 package org.lexize.lutils;
 
-import org.moon.figura.permissions.FiguraPermissions;
+import org.moon.figura.entries.FiguraPermissions;
 import org.moon.figura.permissions.Permissions;
 
 import java.util.Collection;

@@ -12,8 +12,6 @@ import org.luaj.vm2.LuaTable;
 import org.moon.figura.FiguraMod;
 import org.moon.figura.avatar.Avatar;
 import org.moon.figura.lua.LuaWhitelist;
-import org.moon.figura.permissions.FiguraPermissions;
-import org.moon.figura.permissions.Permissions;
 
 import java.io.IOException;
 import java.io.InputStream;
